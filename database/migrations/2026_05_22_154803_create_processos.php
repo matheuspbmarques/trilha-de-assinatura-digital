@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -12,7 +13,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('processos', function (Blueprint $table) {
-            $table->uuid('id')->unique();
+            $table->uuid('id')->primary()->unique()->default(DB::raw('gen_random_uuid()'));
             $table->uuid('usuario_id');
             $table->string('titulo', 256);
             $table->string('descricao', 1024);
@@ -25,7 +26,7 @@ return new class extends Migration
         });
 
         Schema::create('processos_historico', function (Blueprint $table) {
-            $table->uuid('id')->unique();
+            $table->uuid('id')->primary()->unique()->default(DB::raw('gen_random_uuid()'));
             $table->uuid('processo_id');
             $table->enum('campo', ['titulo', 'descricao', 'status', 'categoria', 'url']);
             $table->string('descricao', 1024);
