@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 
 #[Table('signatarios_historico')]
 #[Guarded(['campo', 'descricao', 'created_at'])]
-class SignatarioHistorico extends Model {}
+class SignatarioHistorico extends Model {
+    public $timestamps = false;
+}

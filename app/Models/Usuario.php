@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 
 #[Guarded(['acesso', 'senha'])]
 #[Hidden(['senha'])]
-class Usuario extends Model {}
+class Usuario extends Model {
+    public $timestamps = false;
+}
