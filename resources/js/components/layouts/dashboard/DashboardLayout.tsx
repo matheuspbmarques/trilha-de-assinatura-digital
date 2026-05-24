@@ -3,12 +3,21 @@ import { HTMLAttributes, ReactElement } from 'react';
 import HomeFilledIcon from '@mui/icons-material/HomeFilled';
 import PeopleIcon from '@mui/icons-material/People';
 import FilePresentIcon from '@mui/icons-material/FilePresent';
+import {
+    Box,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+} from '@mui/material';
+import { SignOutMenuButton } from '@/components/SignOutMenuButton';
 
 export type MenuItem = {
     icon: ReactElement;
     text: string;
     route: string;
-}
+};
 
 const menuItems: Array<MenuItem> = [
     {
@@ -33,10 +42,29 @@ export default function DashboardLayout({
     children,
     ...props
 }: HTMLAttributes<HTMLDivElement>) {
+    const renderMenuItems = menuItems.map(({ icon, text, route }, index) => {
+        return (
+            <ListItem key={index} className="px-0!">
+                <ListItemButton>
+                    <ListItemIcon>{icon}</ListItemIcon>
+                    <ListItemText primary={text} className="text-slate-100" />
+                </ListItemButton>
+            </ListItem>
+        );
+    });
+
     return (
-        <div {...props} className={`${className}`}>
+        <Box
+            component="div"
+            {...props}
+            className={`h-dvh lg:flex ${className}`}
+        >
             <MobileMenu menuItems={menuItems} />
-            <main>{children}</main>
-        </div>
+            <Box component="aside" className="flex flex-col max-lg:hidden">
+                <List className='flex-1'>{renderMenuItems}</List>
+                <SignOutMenuButton />
+            </Box>
+            <main className="flex-1 bg-slate-100">{children}</main>
+        </Box>
     );
 }
