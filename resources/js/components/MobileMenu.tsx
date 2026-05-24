@@ -11,10 +11,8 @@ import {
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useState } from 'react';
-import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
-import { router } from '@inertiajs/react';
-import { localApiBaseUrl } from '@/api/local.api';
 import { MenuItem } from './layouts/dashboard/DashboardLayout';
+import { SignOutMenuButton } from './SignOutMenuButton';
 
 export default function MobileMenu({
     menuItems,
@@ -49,18 +47,7 @@ export default function MobileMenu({
                 anchor="right"
             >
                 <List className="flex-1">{renderMenuItems}</List>
-                <ListItem>
-                    <ListItemButton
-                        onClick={() =>
-                            router.get(`${localApiBaseUrl}/api/auth/sign-out`)
-                        }
-                    >
-                        <ListItemIcon>
-                            <MeetingRoomIcon />
-                        </ListItemIcon>
-                        <ListItemText primary="Sair" />
-                    </ListItemButton>
-                </ListItem>
+                <SignOutMenuButton />
             </Drawer>
         </>
     );
