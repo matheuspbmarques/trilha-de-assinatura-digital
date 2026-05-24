@@ -1,9 +1,10 @@
-import { env } from '@/env';
 import axios from 'axios';
 import 'dotenv';
 
+export const localApiBaseUrl = 'http://localhost:8000';
+
 export const localApi = axios.create({
-    baseURL: env.APP_URL,
+    baseURL: `${localApiBaseUrl}/api`,
     withCredentials: true,
     withXSRFToken: true,
 });
