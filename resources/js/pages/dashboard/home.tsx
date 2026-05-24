@@ -1,5 +1,5 @@
-import MenuHeader from "@/components/MenuHeader";
+import DashboardLayout from "@/components/layouts/dashboard/DashboardLayout";
 
 export default function Home() {
-    return <MenuHeader></MenuHeader>;
+    return <DashboardLayout></DashboardLayout>;
 }
