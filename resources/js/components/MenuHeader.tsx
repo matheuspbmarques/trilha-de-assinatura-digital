@@ -23,16 +23,16 @@ export default function MenuHeader() {
 
     return (
         <>
-            <AppBar>
+            <AppBar className="lg:hidden! items-end">
                 <Toolbar>
                     <IconButton onClick={() => setShowMenu(true)}>
                         <MenuIcon />
                     </IconButton>
                 </Toolbar>
             </AppBar>
-            <Drawer open={showMenu} onClose={() => setShowMenu(false)}>
+            <Drawer open={showMenu} onClose={() => setShowMenu(false)} anchor='right'>
                 <List className="flex-1">
-                    <ListItem>
+                    <ListItem className="px-0!">
                         <ListItemButton>
                             <ListItemIcon>
                                 <HomeFilledIcon />
@@ -40,7 +40,7 @@ export default function MenuHeader() {
                             <ListItemText primary="Início" />
                         </ListItemButton>
                     </ListItem>
-                    <ListItem>
+                    <ListItem className="px-0!">
                         <ListItemButton>
                             <ListItemIcon>
                                 <PeopleIcon />
@@ -48,7 +48,7 @@ export default function MenuHeader() {
                             <ListItemText primary="Signatários" />
                         </ListItemButton>
                     </ListItem>
-                    <ListItem>
+                    <ListItem className="px-0!">
                         <ListItemButton>
                             <ListItemIcon>
                                 <FilePresentIcon />
