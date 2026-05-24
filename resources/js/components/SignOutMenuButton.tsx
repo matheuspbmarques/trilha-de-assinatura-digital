@@ -19,7 +19,7 @@ export function SignOutMenuButton() {
                 <ListItemIcon>
                     <MeetingRoomIcon />
                 </ListItemIcon>
-                <ListItemText primary="Sair" />
+                <ListItemText primary="Sair" className='lg:text-slate-100' />
             </ListItemButton>
         </ListItem>
     );
