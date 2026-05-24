@@ -18,7 +18,7 @@ import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import { router } from '@inertiajs/react';
 import { localApiBaseUrl } from '@/api/local.api';
 
-export default function MenuHeader() {
+export default function MobileMenu() {
     const [showMenu, setShowMenu] = useState<boolean>(false);
 
     return (
