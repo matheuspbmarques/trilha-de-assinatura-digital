@@ -11,9 +11,9 @@ import {
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useState } from 'react';
-import { MenuItem } from './layouts/dashboard/DashboardLayout';
+import { MenuItem } from './DashboardLayout';
 import { SignOutMenuButton } from './SignOutMenuButton';
-import { router } from '@inertiajs/react'
+import { router } from '@inertiajs/react';
 
 export default function MobileMenu({
     menuItems,
@@ -35,7 +35,10 @@ export default function MobileMenu({
 
     return (
         <>
-            <AppBar className="items-end lg:hidden!" sx={{ position: 'static' }}>
+            <AppBar
+                className="items-end lg:hidden!"
+                sx={{ position: 'static' }}
+            >
                 <Toolbar>
                     <IconButton onClick={() => setShowMenu(true)}>
                         <MenuIcon />

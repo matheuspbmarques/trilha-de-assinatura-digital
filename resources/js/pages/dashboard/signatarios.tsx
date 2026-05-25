@@ -1,4 +1,4 @@
-import DashboardLayout from '@/components/layouts/dashboard/DashboardLayout';
+import DashboardLayout from './components/DashboardLayout';
 import { Title } from './components/Title';
 import { Button, IconButton } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';

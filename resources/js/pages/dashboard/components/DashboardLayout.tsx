@@ -1,4 +1,4 @@
-import MobileMenu from '@/components/MobileMenu';
+import MobileMenu from './MobileMenu';
 import { HTMLAttributes, ReactElement } from 'react';
 import HomeFilledIcon from '@mui/icons-material/HomeFilled';
 import PeopleIcon from '@mui/icons-material/People';
@@ -11,7 +11,7 @@ import {
     ListItemIcon,
     ListItemText,
 } from '@mui/material';
-import { SignOutMenuButton } from '@/components/SignOutMenuButton';
+import { SignOutMenuButton } from './SignOutMenuButton';
 import { router } from '@inertiajs/react';
 
 export type MenuItem = {
@@ -58,11 +58,11 @@ export default function DashboardLayout({
         <Box
             component="div"
             {...props}
-            className={`flex flex-col h-dvh lg:flex-row ${className}`}
+            className={`flex h-dvh flex-col lg:flex-row ${className}`}
         >
             <MobileMenu menuItems={menuItems} />
             <Box component="aside" className="flex flex-col max-lg:hidden">
-                <List className='flex-1'>{renderMenuItems}</List>
+                <List className="flex-1">{renderMenuItems}</List>
                 <SignOutMenuButton />
             </Box>
             <main className="flex-1 bg-slate-100 p-6">{children}</main>
