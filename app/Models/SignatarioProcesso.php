@@ -10,4 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 #[Guarded(['signatario_id', 'processo_id', 'created_at'])]
 class SignatarioProcesso extends Model {
     public $timestamps = false;
+    public $incrementing = false;
+    public $keyType = 'string';
 }
+

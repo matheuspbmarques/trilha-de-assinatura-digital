@@ -27,4 +27,7 @@ use Illuminate\Database\Eloquent\Model;
 #[Guarded(['campo', 'descricao', 'created_at'])]
 class SignatarioHistorico extends Model {
     public $timestamps = false;
+    public $incrementing = false;
+    public $keyType = 'string';
 }
+

@@ -27,4 +27,7 @@ use Illuminate\Database\Eloquent\Attributes\Table;
 #[Guarded(['usuario_id', 'campo', 'descricao'])]
 class UsuarioHistorico extends Model {
     public $timestamps = false;
+    public $incrementing = false;
+    public $keyType = 'string';
 }
+

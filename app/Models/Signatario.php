@@ -31,5 +31,7 @@ use Illuminate\Database\Eloquent\Model;
 #[Guarded(['nome', 'email', 'cargo', 'setor', 'ativo'])]
 class Signatario extends Model {
     public $timestamps = false;
+    public $incrementing = false;
     public $keyType = 'string';
 }
+

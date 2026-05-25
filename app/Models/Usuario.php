@@ -28,5 +28,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 class Usuario extends Model
 {
     public $timestamps = false;
+    public $incrementing = false;
     public $keyType = 'string';
 }
+
