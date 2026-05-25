@@ -1,4 +1,4 @@
-import AuthLayout from '@/components/layouts/auth/AuthLayout';
+import { AuthLayout } from './components/AuthLayout';
 import {
     Button,
     FormControl,
