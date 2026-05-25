@@ -8,12 +8,13 @@ import {
     ListItemIcon,
     ListItemText,
     Toolbar,
+    Typography,
 } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useState } from 'react';
-import { MenuItem } from './layouts/dashboard/DashboardLayout';
+import { MenuItem } from './DashboardLayout';
 import { SignOutMenuButton } from './SignOutMenuButton';
-import { router } from '@inertiajs/react'
+import { router } from '@inertiajs/react';
 
 export default function MobileMenu({
     menuItems,
@@ -24,7 +25,7 @@ export default function MobileMenu({
 
     const renderMenuItems = menuItems.map(({ icon, text, route }, index) => {
         return (
-            <ListItem key={index} className="px-0!">
+            <ListItem key={index} className="p-0!">
                 <ListItemButton onClick={() => router.visit(route)}>
                     <ListItemIcon>{icon}</ListItemIcon>
                     <ListItemText primary={text} />
@@ -35,9 +36,15 @@ export default function MobileMenu({
 
     return (
         <>
-            <AppBar className="items-end lg:hidden!" sx={{ position: 'static' }}>
+            <AppBar position="static" component="div" className='lg:hidden!'>
                 <Toolbar>
-                    <IconButton onClick={() => setShowMenu(true)}>
+                    <Typography variant="overline" sx={{ flex: 1 }}>
+                        Trilha de Assinatura Digital
+                    </Typography>
+                    <IconButton
+                        color="inherit"
+                        onClick={() => setShowMenu(true)}
+                    >
                         <MenuIcon />
                     </IconButton>
                 </Toolbar>
@@ -47,7 +54,7 @@ export default function MobileMenu({
                 onClose={() => setShowMenu(false)}
                 anchor="right"
             >
-                <List className="flex-1">{renderMenuItems}</List>
+                <List className="flex-1 p-0!">{renderMenuItems}</List>
                 <SignOutMenuButton />
             </Drawer>
         </>

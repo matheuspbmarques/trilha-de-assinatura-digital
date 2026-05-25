@@ -20,6 +20,6 @@ class SignatarioService {
 
         $this->signatarioRepository->createNew($nome, $email, $cargo, $setor);
 
-        return response('Signatário criado com sucesso!', 201);
+        return back();
     }
 }

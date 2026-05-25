@@ -9,64 +9,52 @@ import {
     OutlinedInput,
     TextField,
 } from '@mui/material';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import SignInIllustration from '../../components/illustrations/SignInIllustration';
-import { useState } from 'react';
+import { SubmitEventHandler, useState } from 'react';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { router } from '@inertiajs/react'
-import { localApiBaseUrl } from '@/api/local.api';
-
-const signInSchema = z.object({
-    acesso: z.string().min(1, 'Informe o seu acesso'),
-    senha: z.string().min(1, 'Informe a sua senha'),
-});
-type TSignIn = z.infer<typeof signInSchema>;
+import { useForm } from '@inertiajs/react';
 
 export default function SignIn() {
     const [showPassword, setShowPassword] = useState<Boolean>(false);
 
-    const {
-        handleSubmit,
-        register,
-        formState: { errors },
-    } = useForm<TSignIn>({
-        resolver: zodResolver(signInSchema),
+    const { post, errors, setData, processing } = useForm({
+        acesso: '',
+        senha: '',
     });
 
-    const submit = (data: TSignIn) => {
-        router.post(`${localApiBaseUrl}/api/auth/sign-in`, data, {
-            onError: e => {
-                console.log(e);
-            }
-        })
+    const submit: SubmitEventHandler<HTMLFormElement> = (e) => {
+        e.preventDefault();
+
+        post('/api/auth/sign-in');
     };
 
     return (
         <AuthLayout>
-            <div className="flex flex-1 items-center lg:justify-end">
-                <span className="w-64 lg:w-sm">
+            <div className="flex w-full flex-3">
+                <span className="m-auto flex h-64">
                     <SignInIllustration />
                 </span>
             </div>
-            <div className="flex w-full flex-2 flex-col items-center gap-4 lg:flex-1 lg:items-start">
+            <div className="w-full flex-4">
                 <form
-                    onSubmit={handleSubmit(submit)}
-                    className="flex w-full max-w-xs flex-col gap-4"
+                    onSubmit={submit}
+                    className="mx-auto flex max-w-xs flex-col gap-4"
                 >
                     <TextField
                         label="Acesso"
                         placeholder="Informe o seu acesso"
-                        {...register('acesso')}
                         error={!!errors.acesso}
-                        helperText={errors.acesso?.message}
+                        helperText={errors.acesso}
+                        name="acesso"
+                        onChange={(e) => setData('acesso', e.target.value)}
+                        disabled={processing}
                     />
                     <FormControl error={!!errors.senha}>
                         <InputLabel>Senha</InputLabel>
                         <OutlinedInput
                             label="Senha"
+                            name="senha"
                             type={showPassword ? 'text' : 'password'}
                             endAdornment={
                                 <InputAdornment position="end">
@@ -75,7 +63,7 @@ export default function SignIn() {
                                             setShowPassword(!showPassword)
                                         }
                                         color={
-                                            !!errors.senha ? 'error' : 'primary'
+                                            !!errors.senha ? 'error' : undefined
                                         }
                                     >
                                         {showPassword ? (
@@ -86,13 +74,18 @@ export default function SignIn() {
                                     </IconButton>
                                 </InputAdornment>
                             }
-                            {...register('senha')}
+                            onChange={(e) => setData('senha', e.target.value)}
+                            disabled={processing}
                         />
                         <FormHelperText error={!!errors.senha}>
-                            {errors.senha?.message}
+                            {errors.senha}
                         </FormHelperText>
                     </FormControl>
-                    <Button variant="contained" type="submit">
+                    <Button
+                        variant="contained"
+                        type="submit"
+                        disabled={processing}
+                    >
                         Entrar
                     </Button>
                 </form>
