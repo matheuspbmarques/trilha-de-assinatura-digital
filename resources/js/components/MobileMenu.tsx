@@ -13,6 +13,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { useState } from 'react';
 import { MenuItem } from './layouts/dashboard/DashboardLayout';
 import { SignOutMenuButton } from './SignOutMenuButton';
+import { router } from '@inertiajs/react'
 
 export default function MobileMenu({
     menuItems,
@@ -24,7 +25,7 @@ export default function MobileMenu({
     const renderMenuItems = menuItems.map(({ icon, text, route }, index) => {
         return (
             <ListItem key={index} className="px-0!">
-                <ListItemButton>
+                <ListItemButton onClick={() => router.visit(route)}>
                     <ListItemIcon>{icon}</ListItemIcon>
                     <ListItemText primary={text} />
                 </ListItemButton>

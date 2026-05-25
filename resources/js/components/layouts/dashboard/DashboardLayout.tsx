@@ -12,6 +12,7 @@ import {
     ListItemText,
 } from '@mui/material';
 import { SignOutMenuButton } from '@/components/SignOutMenuButton';
+import { router } from '@inertiajs/react';
 
 export type MenuItem = {
     icon: ReactElement;
@@ -45,7 +46,7 @@ export default function DashboardLayout({
     const renderMenuItems = menuItems.map(({ icon, text, route }, index) => {
         return (
             <ListItem key={index} className="px-0!">
-                <ListItemButton>
+                <ListItemButton onClick={() => router.visit(route)}>
                     <ListItemIcon>{icon}</ListItemIcon>
                     <ListItemText primary={text} className="text-slate-100" />
                 </ListItemButton>
