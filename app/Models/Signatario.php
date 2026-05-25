@@ -6,14 +6,14 @@ use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @property int $id
+ * @property string $id
  * @property string $nome
  * @property string $email
  * @property string $cargo
  * @property string $setor
  * @property bool $ativo
- * @property string|null $created_at
- * @property string|null $updated_at
+ * @property string $created_at
+ * @property string $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Signatario newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Signatario newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Signatario query()
@@ -30,4 +30,5 @@ use Illuminate\Database\Eloquent\Model;
 #[Guarded(['nome', 'email', 'cargo', 'setor', 'ativo'])]
 class Signatario extends Model {
     public $timestamps = false;
+    public $keyType = 'string';
 }
