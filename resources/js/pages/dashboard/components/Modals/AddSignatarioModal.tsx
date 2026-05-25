@@ -1,40 +1,35 @@
 import { Modal } from '@/components/Modal';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, TextField } from '@mui/material';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
-import { router } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
+import { SubmitEventHandler } from 'react';
 
 type TAddSignatarioModal = {
     open: boolean;
     onClose(): void;
+    onCreate(): void;
 };
 
-const addSignatarioFormSchema = z.object({
-    nome: z.string().min(1, 'Informe o nome do signatário'),
-    email: z.email('Informe um e-mail válido'),
-    cargo: z.string().min(1, 'Informe o cargo do signatário'),
-    setor: z.string().min(1, 'Informe o setor do signatário'),
-});
-
-type TAddSignatario = z.infer<typeof addSignatarioFormSchema>;
-
-export function AddSignatarioModal({ open, onClose }: TAddSignatarioModal) {
-    const {
-        handleSubmit,
-        register,
-        formState: { errors },
-    } = useForm<TAddSignatario>({
-        resolver: zodResolver(addSignatarioFormSchema),
+export function AddSignatarioModal({
+    open,
+    onClose,
+    onCreate,
+}: TAddSignatarioModal) {
+    const { errors, setData, post, clearErrors, processing, reset } = useForm({
+        nome: '',
+        email: '',
+        cargo: '',
+        setor: '',
     });
 
-    const submit = (data: TAddSignatario) => {
-        router.post('../api/signatarios', data, {
-            onSuccess(res) {
-                console.log(res);
-            },
-            onError(res) {
-                console.log('error', res);
+    const submit: SubmitEventHandler<HTMLFormElement> = (e) => {
+        e.preventDefault();
+
+        post('/api/signatarios', {
+            onSuccess() {
+                console.log('Success!');
+                reset();
+                onClose();
+                onCreate();
             },
         });
     };
@@ -48,37 +43,55 @@ export function AddSignatarioModal({ open, onClose }: TAddSignatarioModal) {
                     </Modal.Header.Title>
                     <Modal.Header.CloseButton onClick={onClose} />
                 </Modal.Header.Container>
-                <form
-                    onSubmit={handleSubmit(submit)}
-                    className="flex flex-col gap-2"
-                >
+                <form onSubmit={submit} className="flex flex-col gap-2">
                     <div className="flex flex-col gap-4">
                         <TextField
                             label="Nome"
-                            {...register('nome')}
+                            name="nome"
                             error={!!errors.nome}
-                            helperText={errors.nome?.message}
+                            helperText={errors.nome}
+                            onChange={(e) => {
+                                setData('nome', e.target.value);
+                                clearErrors('nome');
+                            }}
+                            disabled={processing}
                         />
                         <TextField
                             label="E-mail"
-                            {...register('email')}
+                            name="email"
                             error={!!errors.email}
-                            helperText={errors.email?.message}
+                            helperText={errors.email}
+                            onChange={(e) => {
+                                setData('email', e.target.value);
+                                clearErrors('email');
+                            }}
                         />
                         <TextField
                             label="Cargo"
-                            {...register('cargo')}
                             error={!!errors.cargo}
-                            helperText={errors.cargo?.message}
+                            helperText={errors.cargo}
+                            onChange={(e) => {
+                                setData('cargo', e.target.value);
+                                clearErrors('cargo');
+                            }}
+                            disabled={processing}
                         />
                         <TextField
                             label="Setor/Departamento"
-                            {...register('setor')}
                             error={!!errors.setor}
-                            helperText={errors.setor?.message}
+                            helperText={errors.setor}
+                            onChange={(e) => {
+                                setData('setor', e.target.value);
+                                clearErrors('setor');
+                            }}
+                            disabled={processing}
                         />
                     </div>
-                    <Button variant="contained" type="submit">
+                    <Button
+                        variant="contained"
+                        type="submit"
+                        disabled={processing}
+                    >
                         Criar
                     </Button>
                 </form>

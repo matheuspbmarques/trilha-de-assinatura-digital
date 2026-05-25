@@ -30,6 +30,7 @@ export default function Signatarios() {
             <AddSignatarioModal
                 open={showAddSignatarioModal}
                 onClose={() => setShowAddSignatarioModal(false)}
+                onCreate={() => {}}
             />
         </DashboardLayout>
     );
