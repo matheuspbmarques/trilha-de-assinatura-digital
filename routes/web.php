@@ -10,5 +10,6 @@ Route::middleware(AuthMiddleware::class)->group(function() {
 
     Route::prefix('dashboard')->group(function () {
         Route::inertia('home', 'dashboard/home')->name('dashboard.home');
+        Route::inertia('signatarios', 'dashboard/signatarios')->name('dashboard.signatarios');
     });
 });
