@@ -14,7 +14,7 @@ export default function Signatarios() {
         <DashboardLayout>
             <header className="flex justify-between">
                 <Title>Signatarios</Title>
-                <IconButton onClick={() => setShowAddSignatarioModal(true)}>
+                <IconButton className='lg:hidden!' onClick={() => setShowAddSignatarioModal(true)}>
                     <AddIcon />
                 </IconButton>
                 <Button
