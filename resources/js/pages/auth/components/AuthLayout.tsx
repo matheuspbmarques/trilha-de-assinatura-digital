@@ -15,5 +15,9 @@ const theme = createTheme({
 });
 
 export function AuthLayout({ children }: { children: ReactNode }) {
-    return <ThemeProvider theme={theme}>{children}</ThemeProvider>;
+    return (
+        <ThemeProvider theme={theme}>
+            <main className="flex flex-col items-center h-dvh p-8">{children}</main>
+        </ThemeProvider>
+    );
 }
