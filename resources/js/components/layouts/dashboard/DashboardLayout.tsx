@@ -57,14 +57,14 @@ export default function DashboardLayout({
         <Box
             component="div"
             {...props}
-            className={`h-dvh lg:flex ${className}`}
+            className={`flex flex-col h-dvh lg:flex-row ${className}`}
         >
             <MobileMenu menuItems={menuItems} />
             <Box component="aside" className="flex flex-col max-lg:hidden">
                 <List className='flex-1'>{renderMenuItems}</List>
                 <SignOutMenuButton />
             </Box>
-            <main className="flex-1 bg-slate-100">{children}</main>
+            <main className="flex-1 bg-slate-100 p-6">{children}</main>
         </Box>
     );
 }
