@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SignatarioHistorico whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|SignatarioHistorico whereSignatarioId($value)
  * @mixin \Eloquent
+ * @mixin IdeHelperSignatarioHistorico
  */
 #[Table('signatarios_historico')]
 #[Guarded(['campo', 'descricao', 'created_at'])]

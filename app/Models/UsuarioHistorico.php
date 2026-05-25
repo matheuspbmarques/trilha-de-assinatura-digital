@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Attributes\Table;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UsuarioHistorico whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|UsuarioHistorico whereUsuarioId($value)
  * @mixin \Eloquent
+ * @mixin IdeHelperUsuarioHistorico
  */
 #[Table('usuarios_historico')]
 #[Guarded(['usuario_id', 'campo', 'descricao'])]

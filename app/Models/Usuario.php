@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
  * @property string $id
  * @property string $acesso
  * @property string $senha
- * @property string|null $created_at
- * @property string|null $updated_at
+ * @property string $created_at
+ * @property string $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario query()
@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario whereSenha($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @mixin IdeHelperUsuario
  */
 #[Guarded(['acesso', 'senha'])]
 #[Hidden(['senha'])]

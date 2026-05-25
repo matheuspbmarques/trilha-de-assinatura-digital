@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\SignatarioController;
 use App\Http\Middleware\AuthMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -10,6 +11,9 @@ Route::middleware(AuthMiddleware::class)->group(function() {
 
     Route::prefix('dashboard')->group(function () {
         Route::inertia('home', 'dashboard/home')->name('dashboard.home');
-        Route::inertia('signatarios', 'dashboard/signatarios')->name('dashboard.signatarios');
+
+        Route::controller(SignatarioController::class)->group(function() {
+            Route::get('signatarios', 'getAll')->name('dashboard.signatarios');
+        });
     });
 });

@@ -13,8 +13,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $status
  * @property string $categoria
  * @property string $url
- * @property string|null $created_at
- * @property string|null $updated_at
+ * @property string $created_at
+ * @property string $updated_at
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Processo newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Processo newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Processo query()
@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Processo whereUrl($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Processo whereUsuarioId($value)
  * @mixin \Eloquent
+ * @mixin IdeHelperProcesso
  */
 #[Guarded(['titulo', 'descricao', 'status', 'usuario_id', 'categoria', 'url'])]
 class Processo extends Model {

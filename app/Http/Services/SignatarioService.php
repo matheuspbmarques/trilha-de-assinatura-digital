@@ -22,4 +22,20 @@ class SignatarioService {
 
         return back();
     }
+
+    public function getAll() {
+        return $this->signatarioRepository->findAll();
+    }
+
+    public function update(string $id, Request $request) {
+        $nome = $request->input('nome');
+        $email = $request->input('email');
+        $cargo = $request->input('cargo');
+        $setor = $request->input('setor');
+        $ativo = filter_var($request->input('ativo', true), FILTER_VALIDATE_BOOLEAN);
+
+        $this->signatarioRepository->updateById($id, $nome, $email, $cargo, $setor, $ativo);
+
+        return back();
+    }
 }

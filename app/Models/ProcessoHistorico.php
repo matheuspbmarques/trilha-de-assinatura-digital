@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProcessoHistorico whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProcessoHistorico whereProcessoId($value)
  * @mixin \Eloquent
+ * @mixin IdeHelperProcessoHistorico
  */
 #[Table('processos_historico')]
 #[Guarded(['processo_id', 'campo', 'descricao', 'created_at'])]

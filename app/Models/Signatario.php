@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Signatario whereSetor($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Signatario whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @mixin IdeHelperSignatario
  */
 #[Guarded(['nome', 'email', 'cargo', 'setor', 'ativo'])]
 class Signatario extends Model {

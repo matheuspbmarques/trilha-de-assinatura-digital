@@ -63,7 +63,7 @@ export default function DashboardLayout({
                 <List className="flex-1! p-0!">{renderMenuItems}</List>
                 <SignOutMenuButton />
             </aside>
-            <main className="flex-1 p-6">{children}</main>
+            <main className="flex-1 p-6 flex flex-col gap-6">{children}</main>
         </div>
     );
 }
