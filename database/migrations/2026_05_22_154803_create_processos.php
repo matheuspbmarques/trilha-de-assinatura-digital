@@ -20,8 +20,8 @@ return new class extends Migration
             $table->enum('status', ['Pendente', 'Em aprovação', 'Aprovado', 'Reprovado', 'Cancelado']);
             $table->string('categoria', 256);
             $table->string('url', 1024);
-            $table->timestampTz('created_at')->useCurrent();
-            $table->timestampTz('updated_at')->useCurrent();
+            $table->timestampTz('created_at')->default('NOW()');
+            $table->timestampTz('updated_at')->default('NOW()');
 
             $table->foreign('usuario_id')->references('id')->on('usuarios');
         });
@@ -31,7 +31,7 @@ return new class extends Migration
             $table->uuid('processo_id');
             $table->enum('campo', ['titulo', 'descricao', 'status', 'categoria', 'url']);
             $table->string('descricao', 1024);
-            $table->timestampTz('created_at')->useCurrent();
+            $table->timestampTz('created_at')->default('NOW()');
 
             $table->foreign('processo_id')->references('id')->on('processos');
         });

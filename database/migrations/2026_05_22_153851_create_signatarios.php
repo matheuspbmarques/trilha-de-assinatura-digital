@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('cargo', '256');
             $table->string('setor', '256');
             $table->boolean('ativo')->default(true);
-            $table->timestampTz('created_at')->useCurrent();
-            $table->timestampTz('updated_at')->useCurrent();
+            $table->timestampTz('created_at')->default('NOW()');
+            $table->timestampTz('updated_at')->default('NOW()');
         });
 
         Schema::create('signatarios_historico', function (Blueprint $table) {
@@ -28,7 +28,7 @@ return new class extends Migration
             $table->uuid('signatario_id');
             $table->enum('campo', ['nome', 'email', 'cargo', 'setor', 'senha', 'ativo']);
             $table->string('descricao', 1024);
-            $table->timestampTz('created_at')->useCurrent();
+            $table->timestampTz('created_at')->default('NOW()');
 
             $table->foreign('signatario_id')->references('id')->on('signatarios');
         });

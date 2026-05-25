@@ -16,7 +16,7 @@ return new class extends Migration
             $table->uuid('id')->primary()->unique()->default(DB::raw('gen_random_uuid()'));
             $table->uuid('signatario_id');
             $table->uuid('processo_id');
-            $table->timestampTz('created_at');
+            $table->timestampTz('created_at')->useCurrent();
 
             $table->foreign('signatario_id')->references('id')->on('signatarios');
             $table->foreign('processo_id')->references('id')->on('processos');
