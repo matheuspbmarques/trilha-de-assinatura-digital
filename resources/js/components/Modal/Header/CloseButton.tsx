@@ -1,9 +1,10 @@
-import { IconButton, IconButtonProps } from '@mui/material';
+import { IconButton } from '@/components/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import { ButtonProps } from '@mui/material';
 
-export function CloseButton({ className, ...props }:IconButtonProps) {
+export function CloseButton({ ...props }: ButtonProps) {
     return (
-        <IconButton {...props} className={`bg-red-700! ${className}`}>
+        <IconButton color='error' {...props}>
             <CloseIcon />
         </IconButton>
     );

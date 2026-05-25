@@ -1,9 +1,10 @@
 import DashboardLayout from './components/DashboardLayout';
 import { Title } from './components/Title';
-import { Button, IconButton } from '@mui/material';
+import { Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { AddSignatarioModal } from './components/Modals/AddSignatarioModal';
 import { useState } from 'react';
+import { IconButton } from '@/components/IconButton';
 
 export default function Signatarios() {
     const [showAddSignatarioModal, setShowAddSignatarioModal] =
@@ -13,16 +14,14 @@ export default function Signatarios() {
         <DashboardLayout>
             <header className="flex justify-between">
                 <Title>Signatarios</Title>
-                <IconButton
-                    className="bg-slate-800! lg:hidden!"
-                    onClick={() => setShowAddSignatarioModal(true)}
-                >
+                <IconButton onClick={() => setShowAddSignatarioModal(true)}>
                     <AddIcon />
                 </IconButton>
                 <Button
                     startIcon={<AddIcon />}
-                    className="bg-slate-800! max-lg:hidden!"
+                    className="max-lg:hidden!"
                     onClick={() => setShowAddSignatarioModal(true)}
+                    variant="contained"
                 >
                     Novo
                 </Button>

@@ -10,16 +10,17 @@ import { localApiBaseUrl } from '@/api/local.api';
 
 export function SignOutMenuButton() {
     return (
-        <ListItem>
+        <ListItem className="p-0!">
             <ListItemButton
                 onClick={() =>
                     router.get(`${localApiBaseUrl}/api/auth/sign-out`)
                 }
+                className='lg:text-slate-100!'
             >
-                <ListItemIcon>
+                <ListItemIcon className='text-inherit!'>
                     <MeetingRoomIcon />
                 </ListItemIcon>
-                <ListItemText primary="Sair" className='lg:text-slate-100' />
+                <ListItemText primary="Sair" />
             </ListItemButton>
         </ListItem>
     );

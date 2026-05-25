@@ -8,15 +8,6 @@
         'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
+    --color-mui-primary: '#1769aa'
 }
 
-body {
-    @apply bg-slate-800;
-}
-
-.bg {
-    @apply bg-slate-800;
-}
-.fg {
-    @apply bg-slate-100;
-}

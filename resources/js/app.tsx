@@ -7,7 +7,7 @@ const queryClient = new QueryClient();
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     progress: {
-        color: '#4B5563',
+        color: '#1769aa',
     },
     withApp(app) {
         return (

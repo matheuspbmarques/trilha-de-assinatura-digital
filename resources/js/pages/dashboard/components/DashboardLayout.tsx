@@ -4,7 +4,6 @@ import HomeFilledIcon from '@mui/icons-material/HomeFilled';
 import PeopleIcon from '@mui/icons-material/People';
 import FilePresentIcon from '@mui/icons-material/FilePresent';
 import {
-    Box,
     List,
     ListItem,
     ListItemButton,
@@ -45,27 +44,26 @@ export default function DashboardLayout({
 }: HTMLAttributes<HTMLDivElement>) {
     const renderMenuItems = menuItems.map(({ icon, text, route }, index) => {
         return (
-            <ListItem key={index} className="px-0!">
-                <ListItemButton onClick={() => router.visit(route)}>
-                    <ListItemIcon>{icon}</ListItemIcon>
-                    <ListItemText primary={text} className="text-slate-100" />
+            <ListItem key={index} className="p-0!">
+                <ListItemButton onClick={() => router.visit(route)} className='text-slate-100!'>
+                    <ListItemIcon className='text-inherit!'>{icon}</ListItemIcon>
+                    <ListItemText primary={text} />
                 </ListItemButton>
             </ListItem>
         );
     });
 
     return (
-        <Box
-            component="div"
-            {...props}
-            className={`flex h-dvh flex-col lg:flex-row ${className}`}
-        >
+        <div {...props} className="flex h-dvh flex-col lg:flex-row">
             <MobileMenu menuItems={menuItems} />
-            <Box component="aside" className="flex flex-col max-lg:hidden">
-                <List className="flex-1">{renderMenuItems}</List>
+            <aside
+                color="#1769aa"
+                className="flex flex-col bg-[#1769aa]! max-lg:hidden"
+            >
+                <List className="flex-1! p-0!">{renderMenuItems}</List>
                 <SignOutMenuButton />
-            </Box>
-            <main className="flex-1 bg-slate-100 p-6">{children}</main>
-        </Box>
+            </aside>
+            <main className="flex-1 p-6">{children}</main>
+        </div>
     );
 }
