@@ -34,7 +34,7 @@ export default function MobileMenu({
 
     return (
         <>
-            <AppBar className="items-end lg:hidden!">
+            <AppBar className="items-end lg:hidden!" sx={{ position: 'static' }}>
                 <Toolbar>
                     <IconButton onClick={() => setShowMenu(true)}>
                         <MenuIcon />
