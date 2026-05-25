@@ -22,18 +22,18 @@ export type MenuItem = {
 const menuItems: Array<MenuItem> = [
     {
         icon: <HomeFilledIcon />,
-        route: 'dashboard.home',
+        route: 'home',
         text: 'Início',
     },
     {
         icon: <PeopleIcon />,
         text: 'Signatários',
-        route: 'dashboard.signatarios',
+        route: 'signatarios',
     },
     {
         icon: <FilePresentIcon />,
         text: 'Processos',
-        route: 'dashboard.processos',
+        route: 'processos',
     },
 ];
 
