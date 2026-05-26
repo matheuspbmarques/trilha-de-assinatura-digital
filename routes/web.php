@@ -11,7 +11,7 @@ Route::middleware(AuthMiddleware::class)->group(function () {
     });
 
     Route::prefix('dashboard')->group(function () {
-        Route::inertia('home', 'dashboard/home')->name('dashboard.home');
+        Route::get('home', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard.home');
 
         Route::controller(SignatarioController::class)->group(function () {
             Route::get('signatarios', 'getAll')->name('dashboard.signatarios');
