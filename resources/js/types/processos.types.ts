@@ -13,6 +13,7 @@ export type TProcesso = {
     status: TProcessoStatus;
     categoria: string;
     url: string;
+    fluxo_sequencial: boolean;
     created_at: string;
     updated_at: string;
 };

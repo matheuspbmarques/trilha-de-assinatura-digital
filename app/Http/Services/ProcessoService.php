@@ -23,4 +23,27 @@ class ProcessoService
     {
         return $this->processoRepository->paginateByUsuarioId($usuarioId, $perPage);
     }
+
+    /**
+     * Create a new process.
+     */
+    public function create(
+        string $usuarioId,
+        string $titulo,
+        string $descricao,
+        string $categoria,
+        string $url,
+        bool $fluxoSequencial,
+        array $signatarios
+    ) {
+        return $this->processoRepository->createNew(
+            $usuarioId,
+            $titulo,
+            $descricao,
+            $categoria,
+            $url,
+            $fluxoSequencial,
+            $signatarios
+        );
+    }
 }

@@ -17,3 +17,10 @@ Route::prefix('signatarios')->group(function () {
         Route::put('{id}', 'update')->name('api.signatario.update');
     });
 });
+
+Route::prefix('processos')->group(function () {
+    Route::controller(App\Http\Controllers\ProcessoController::class)->group(function () {
+        Route::post(null, 'store')->name('api.processos.store');
+    });
+});
+

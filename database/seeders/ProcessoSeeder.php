@@ -64,6 +64,8 @@ class ProcessoSeeder extends Seeder
             $processo->status = $faker->randomElement($statusOptions);
             $processo->categoria = $faker->randomElement($categorias);
             $processo->url = 'https://example.com/docs/'.$faker->uuid.'.pdf';
+            $fluxoSequencial = $faker->boolean(40); // 40% chance of sequential flow
+            $processo->fluxo_sequencial = $fluxoSequencial;
 
             // Randomize creation date
             $createdAt = $faker->dateTimeBetween('-6 months', 'now');
@@ -74,11 +76,12 @@ class ProcessoSeeder extends Seeder
             // Associate with 1 to 4 random signatories
             $assocCount = rand(1, 4);
             $selectedSignatarios = $faker->randomElements($signatarioIds, min($assocCount, count($signatarioIds)));
-            foreach ($selectedSignatarios as $signatarioId) {
+            foreach ($selectedSignatarios as $index => $signatarioId) {
                 $relation = new SignatarioProcesso;
                 $relation->id = (string) Str::uuid();
                 $relation->signatario_id = $signatarioId;
                 $relation->processo_id = $processo->id;
+                $relation->ordem_assinatura = $fluxoSequencial ? ($index + 1) : null;
                 $relation->created_at = $faker->dateTimeBetween($createdAt, 'now');
                 $relation->save();
             }

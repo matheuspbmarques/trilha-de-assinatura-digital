@@ -1,16 +1,24 @@
 import { router } from '@inertiajs/react';
 import FilePresentIcon from '@mui/icons-material/FilePresent';
-import { Pagination, Box, Typography } from '@mui/material';
+import AddIcon from '@mui/icons-material/Add';
+import { Pagination, Box, Typography, Button } from '@mui/material';
+import { useState } from 'react';
 import type { TPaginatedProcessos } from '@/types/processos.types';
+import type { TSignatario } from '@/types/signatarios.types';
 import DashboardLayout from './components/DashboardLayout';
 import { ProcessoCard } from './components/ProcessoCard';
 import { Title } from './components/Title';
+import { IconButton } from '@/components/IconButton';
+import { AddProcessoModal } from './components/Modals/AddProcessoModal';
 
 type TProcessosPageProps = {
     processos: TPaginatedProcessos;
+    signatarios: TSignatario[];
 };
 
-export default function Processos({ processos }: TProcessosPageProps) {
+export default function Processos({ processos, signatarios = [] }: TProcessosPageProps) {
+    const [modalOpen, setModalOpen] = useState(false);
+
     const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
         // Navigate using Inertia with the new page number, preserving state
         router.get('/dashboard/processos', { page: value }, { preserveState: true });
@@ -26,8 +34,27 @@ export default function Processos({ processos }: TProcessosPageProps) {
 
     return (
         <DashboardLayout>
-            <header className="flex justify-between items-center">
+            <header className="flex justify-between items-center mb-6">
                 <Title>Processos</Title>
+
+                {/* Button for Desktop size */}
+                <Button
+                    variant="contained"
+                    startIcon={<AddIcon />}
+                    onClick={() => setModalOpen(true)}
+                    className="max-lg:hidden!"
+                >
+                    Novo Processo
+                </Button>
+
+                {/* Icon Button for Mobile size */}
+                <IconButton
+                    color="primary"
+                    onClick={() => setModalOpen(true)}
+                    className="inline-flex! lg:hidden!"
+                >
+                    <AddIcon />
+                </IconButton>
             </header>
 
             {processos.data.length === 0 ? (
@@ -58,6 +85,13 @@ export default function Processos({ processos }: TProcessosPageProps) {
                     </Box>
                 </div>
             )}
+
+            <AddProcessoModal
+                open={modalOpen}
+                onClose={() => setModalOpen(false)}
+                onCreate={() => router.reload()}
+                signatarios={signatarios}
+            />
         </DashboardLayout>
     );
 }

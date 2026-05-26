@@ -20,6 +20,7 @@ return new class extends Migration
             $table->enum('status', ['Pendente', 'Em aprovação', 'Aprovado', 'Reprovado', 'Cancelado']);
             $table->string('categoria', 256);
             $table->string('url', 1024);
+            $table->boolean('fluxo_sequencial')->default(false);
             $table->timestampTz('created_at')->default('NOW()');
             $table->timestampTz('updated_at')->default('NOW()');
 
