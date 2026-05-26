@@ -12,6 +12,7 @@ Route::middleware(AuthMiddleware::class)->group(function () {
 
     Route::prefix('dashboard')->group(function () {
         Route::get('home', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard.home');
+        Route::get('relatorios', [App\Http\Controllers\RelatorioController::class, 'index'])->name('dashboard.relatorios');
 
         Route::controller(SignatarioController::class)->group(function () {
             Route::get('signatarios', 'getAll')->name('dashboard.signatarios');
