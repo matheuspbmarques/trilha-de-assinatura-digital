@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Inertia\Response;
+use OpenApi\Attributes as OA;
 
 class ProcessoController
 {
@@ -43,6 +44,40 @@ class ProcessoController
     /**
      * Store a newly created process.
      */
+    #[OA\Post(
+        path: "/processos",
+        summary: "Criar novo processo de assinatura",
+        description: "Inicia um novo processo de assinatura com upload de arquivo PDF/imagem e definição de fluxo e signatários.",
+        tags: ["Processos"],
+        requestBody: new OA\RequestBody(
+            required: true,
+            content: new OA\MediaType(
+                mediaType: "multipart/form-data",
+                schema: new OA\Schema(
+                    required: ["titulo", "descricao", "categoria", "arquivo", "signatarios"],
+                    properties: [
+                        new OA\Property(property: "titulo", type: "string", maxLength: 256, description: "Título do processo"),
+                        new OA\Property(property: "descricao", type: "string", maxLength: 1024, description: "Descrição detalhada"),
+                        new OA\Property(property: "categoria", type: "string", maxLength: 256, description: "Categoria do processo"),
+                        new OA\Property(property: "arquivo", type: "string", format: "binary", description: "Arquivo PDF ou imagem (máx 5MB)"),
+                        new OA\Property(property: "fluxo_sequencial", type: "boolean", description: "Se as assinaturas devem seguir a ordem sequencial", default: false),
+                        new OA\Property(
+                            property: "signatarios",
+                            type: "array",
+                            description: "Lista de UUIDs dos signatários participantes",
+                            items: new OA\Items(type: "string", format: "uuid")
+                        )
+                    ]
+                )
+            )
+        ),
+        responses: [
+            new OA\Response(
+                response: 302,
+                description: "Redirecionamento de volta para o dashboard ou página anterior após a criação do processo, ou erros de validação."
+            )
+        ]
+    )]
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [

@@ -1,0 +1,269 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Trilha de Assinatura Digital API",
+        "description": "Documentação da API REST do sistema de Trilha de Assinatura Digital.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000/api",
+            "description": "Servidor de Desenvolvimento Local"
+        }
+    ],
+    "paths": {
+        "/auth/sign-in": {
+            "post": {
+                "tags": [
+                    "Autenticação"
+                ],
+                "summary": "Autenticar usuário",
+                "description": "Realiza a autenticação do usuário no sistema utilizando acesso (username/email) e senha.",
+                "operationId": "88696b680d5e73bbbbfbc88b2ec80491",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "required": [
+                                    "acesso",
+                                    "senha"
+                                ],
+                                "properties": {
+                                    "acesso": {
+                                        "description": "O identificador de acesso do usuário",
+                                        "type": "string"
+                                    },
+                                    "senha": {
+                                        "description": "A senha do usuário",
+                                        "type": "string",
+                                        "format": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirecionamento para o dashboard em caso de sucesso, ou de volta com erros de validação."
+                    }
+                }
+            }
+        },
+        "/auth/sign-out": {
+            "get": {
+                "tags": [
+                    "Autenticação"
+                ],
+                "summary": "Deslogar usuário",
+                "description": "Encerra a sessão ativa do usuário e o redireciona para a página de login.",
+                "operationId": "2ba7ac6160b931dbbaf130e2fe0fccb5",
+                "responses": {
+                    "302": {
+                        "description": "Redirecionamento para a página de login."
+                    }
+                }
+            }
+        },
+        "/processos": {
+            "post": {
+                "tags": [
+                    "Processos"
+                ],
+                "summary": "Criar novo processo de assinatura",
+                "description": "Inicia um novo processo de assinatura com upload de arquivo PDF/imagem e definição de fluxo e signatários.",
+                "operationId": "c439be1970301379fd6af41e07362254",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "titulo",
+                                    "descricao",
+                                    "categoria",
+                                    "arquivo",
+                                    "signatarios"
+                                ],
+                                "properties": {
+                                    "titulo": {
+                                        "description": "Título do processo",
+                                        "type": "string",
+                                        "maxLength": 256
+                                    },
+                                    "descricao": {
+                                        "description": "Descrição detalhada",
+                                        "type": "string",
+                                        "maxLength": 1024
+                                    },
+                                    "categoria": {
+                                        "description": "Categoria do processo",
+                                        "type": "string",
+                                        "maxLength": 256
+                                    },
+                                    "arquivo": {
+                                        "description": "Arquivo PDF ou imagem (máx 5MB)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "fluxo_sequencial": {
+                                        "description": "Se as assinaturas devem seguir a ordem sequencial",
+                                        "type": "boolean",
+                                        "default": false
+                                    },
+                                    "signatarios": {
+                                        "description": "Lista de UUIDs dos signatários participantes",
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "uuid"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirecionamento de volta para o dashboard ou página anterior após a criação do processo, ou erros de validação."
+                    }
+                }
+            }
+        },
+        "/signatarios": {
+            "post": {
+                "tags": [
+                    "Signatários"
+                ],
+                "summary": "Cadastrar signatário",
+                "description": "Cria um novo signatário no sistema com nome, e-mail, cargo e setor.",
+                "operationId": "64aa12df1de9f6786dd3ae40f80ff516",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "required": [
+                                    "nome",
+                                    "email",
+                                    "cargo",
+                                    "setor"
+                                ],
+                                "properties": {
+                                    "nome": {
+                                        "description": "Nome completo do signatário",
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "description": "E-mail único do signatário",
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "cargo": {
+                                        "description": "Cargo/função do signatário",
+                                        "type": "string"
+                                    },
+                                    "setor": {
+                                        "description": "Setor/departamento do signatário",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirecionamento para a página anterior após a criação, ou de volta com erros de validação."
+                    }
+                }
+            }
+        },
+        "/signatarios/{id}": {
+            "put": {
+                "tags": [
+                    "Signatários"
+                ],
+                "summary": "Atualizar signatário",
+                "description": "Atualiza as informações de um signatário existente.",
+                "operationId": "c0139635de88341e712e922fb74e6194",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "UUID v4 do signatário",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "required": [
+                                    "nome",
+                                    "email",
+                                    "cargo",
+                                    "setor"
+                                ],
+                                "properties": {
+                                    "nome": {
+                                        "description": "Nome completo do signatário",
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "description": "E-mail do signatário",
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "cargo": {
+                                        "description": "Cargo/função do signatário",
+                                        "type": "string"
+                                    },
+                                    "setor": {
+                                        "description": "Setor/departamento do signatário",
+                                        "type": "string"
+                                    },
+                                    "ativo": {
+                                        "description": "Status de ativação do signatário",
+                                        "type": "boolean",
+                                        "default": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "302": {
+                        "description": "Redirecionamento após a atualização do signatário, ou de volta com erros de validação."
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Autenticação",
+            "description": "Autenticação"
+        },
+        {
+            "name": "Processos",
+            "description": "Processos"
+        },
+        {
+            "name": "Signatários",
+            "description": "Signatários"
+        }
+    ]
+}
