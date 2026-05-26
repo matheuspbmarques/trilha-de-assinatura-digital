@@ -3,6 +3,10 @@ import LaunchIcon from '@mui/icons-material/Launch';
 import { Paper, Typography, Chip, Button } from '@mui/material';
 import type { TProcesso } from '@/types/processos.types';
 
+type TProcessoCardProps = TProcesso & {
+    onShowDetails?: () => void;
+};
+
 export function ProcessoCard({
     titulo,
     descricao,
@@ -10,7 +14,8 @@ export function ProcessoCard({
     categoria,
     url,
     created_at,
-}: TProcesso) {
+    onShowDetails,
+}: TProcessoCardProps) {
     const getStatusConfig = (statusStr: string) => {
         switch (statusStr) {
             case 'Pendente':
@@ -90,8 +95,17 @@ export function ProcessoCard({
                 </div>
             </div>
 
-            {/* Action Button */}
-            <div className="mt-5 pt-3 border-t border-slate-100 flex justify-end">
+            {/* Action Buttons */}
+            <div className="mt-5 pt-3 border-t border-slate-100 flex justify-between gap-2">
+                <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={onShowDetails}
+                    className="text-slate-600! border-slate-200! hover:bg-slate-50! hover:border-slate-300!"
+                    sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.75rem' }}
+                >
+                    Histórico & Signatários
+                </Button>
                 <Button
                     variant="outlined"
                     size="small"
@@ -102,7 +116,7 @@ export function ProcessoCard({
                     className="text-blue-600! border-blue-200! hover:bg-blue-50/50! hover:border-blue-300!"
                     sx={{ textTransform: 'none', fontWeight: 600, fontSize: '0.75rem' }}
                 >
-                    Visualizar Documento
+                    Ver Documento
                 </Button>
             </div>
         </Paper>

@@ -17,8 +17,12 @@ Route::middleware(AuthMiddleware::class)->group(function () {
             Route::get('signatarios', 'getAll')->name('dashboard.signatarios');
         });
 
-        Route::controller(ProcessoController::class)->group(function () {
+    Route::controller(ProcessoController::class)->group(function () {
             Route::get('processos', 'getAll')->name('dashboard.processos');
         });
     });
 });
+
+Route::get('/processos/validar/{token}', [App\Http\Controllers\ProcessoAssinaturaController::class, 'show'])->name('processos.validar');
+Route::post('/processos/validar/{token}', [App\Http\Controllers\ProcessoAssinaturaController::class, 'responder'])->name('processos.responder');
+

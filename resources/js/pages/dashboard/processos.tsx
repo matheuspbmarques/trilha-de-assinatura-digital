@@ -8,6 +8,7 @@ import type { TPaginatedProcessos } from '@/types/processos.types';
 import type { TSignatario } from '@/types/signatarios.types';
 import DashboardLayout from './components/DashboardLayout';
 import { AddProcessoModal } from './components/Modals/AddProcessoModal';
+import { ProcessoDetalhesModal } from './components/Modals/ProcessoDetalhesModal';
 import { ProcessoCard } from './components/ProcessoCard';
 import { Title } from './components/Title';
 
@@ -18,6 +19,8 @@ type TProcessosPageProps = {
 
 export default function Processos({ processos, signatarios = [] }: TProcessosPageProps) {
     const [modalOpen, setModalOpen] = useState(false);
+    const [detailsOpen, setDetailsOpen] = useState(false);
+    const [selectedProcesso, setSelectedProcesso] = useState<any | null>(null);
 
     const handlePageChange = (_event: React.ChangeEvent<unknown>, value: number) => {
         // Navigate using Inertia with the new page number, preserving state
@@ -27,7 +30,13 @@ export default function Processos({ processos, signatarios = [] }: TProcessosPag
     const renderProcessos = processos.data.map((processo, index) => {
         return (
             <li key={processo.id || index} className="h-full">
-                <ProcessoCard {...processo} />
+                <ProcessoCard
+                    {...processo}
+                    onShowDetails={() => {
+                        setSelectedProcesso(processo);
+                        setDetailsOpen(true);
+                    }}
+                />
             </li>
         );
     });
@@ -91,6 +100,15 @@ export default function Processos({ processos, signatarios = [] }: TProcessosPag
                 onClose={() => setModalOpen(false)}
                 onCreate={() => router.reload()}
                 signatarios={signatarios}
+            />
+
+            <ProcessoDetalhesModal
+                open={detailsOpen}
+                onClose={() => {
+                    setDetailsOpen(false);
+                    setSelectedProcesso(null);
+                }}
+                processo={selectedProcesso}
             />
         </DashboardLayout>
     );
