@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Services\ProcessoService;
 use App\Models\Signatario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -79,7 +80,7 @@ class ProcessoController
 
         $file = $request->file('arquivo');
         $path = $file->store('processos', 'public');
-        $url = \Illuminate\Support\Facades\Storage::disk('public')->url($path);
+        $url = Storage::disk('public')->url($path);
 
         $fluxoSequencial = filter_var($request->input('fluxo_sequencial', false), FILTER_VALIDATE_BOOLEAN);
         $signatarios = $request->input('signatarios', []);

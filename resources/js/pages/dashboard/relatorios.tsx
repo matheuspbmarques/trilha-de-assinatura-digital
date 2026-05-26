@@ -1,13 +1,12 @@
 import { router } from '@inertiajs/react';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import SearchIcon from '@mui/icons-material/Search';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-import PeopleIcon from '@mui/icons-material/People';
-import DateRangeIcon from '@mui/icons-material/DateRange';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ClearAllIcon from '@mui/icons-material/ClearAll';
+import DateRangeIcon from '@mui/icons-material/DateRange';
 import DownloadIcon from '@mui/icons-material/Download';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import PeopleIcon from '@mui/icons-material/People';
+import SearchIcon from '@mui/icons-material/Search';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import {
     Paper,
     Typography,
@@ -53,6 +52,12 @@ type TPeriodoReportItem = {
     concluidos: number;
 };
 
+type TCategoriaReportItem = {
+    categoria: string;
+    quantidade: number;
+    percentual: number;
+};
+
 type TReprovacaoReportItem = {
     processo_titulo: string;
     signatario_nome: string;
@@ -70,6 +75,7 @@ type TRelatoriosProps = {
     produtividadeReport: TProdutividadeReportItem[];
     periodoReport: TPeriodoReportItem[];
     reprovacoesReport: TReprovacaoReportItem[];
+    categoriaReport?: TCategoriaReportItem[];
 };
 
 export default function Relatorios({
@@ -78,6 +84,7 @@ export default function Relatorios({
     produtividadeReport = [],
     periodoReport = [],
     reprovacoesReport = [],
+    categoriaReport = [],
 }: TRelatoriosProps) {
     const [dataInicioFilter, setDataInicioFilter] = useState(filters.data_inicio || '');
     const [dataFimFilter, setDataFimFilter] = useState(filters.data_fim || '');
@@ -110,7 +117,10 @@ export default function Relatorios({
     };
 
     const formatDateTime = (dateStr: string | null | undefined) => {
-        if (!dateStr) return '';
+        if (!dateStr) {
+return '';
+}
+
         return new Date(dateStr).toLocaleString('pt-BR', {
             day: '2-digit',
             month: '2-digit',
@@ -147,6 +157,16 @@ export default function Relatorios({
             `${item.percentual}%`
         ]);
         downloadCSV(headers, rows, `relatorio_status_${filters.data_inicio}_a_${filters.data_fim}`);
+    };
+
+    const handleExportCategoria = () => {
+        const headers = ['Categoria', 'Quantidade', 'Percentual (%)'];
+        const rows = categoriaReport.map(item => [
+            item.categoria,
+            String(item.quantidade),
+            `${item.percentual}%`
+        ]);
+        downloadCSV(headers, rows, `relatorio_categorias_${filters.data_inicio}_a_${filters.data_fim}`);
     };
 
     const handleExportPeriodo = () => {
@@ -232,6 +252,7 @@ export default function Relatorios({
                     {[0, 0.25, 0.5, 0.75, 1].map((pct, idx) => {
                         const y = paddingTop + chartHeight * (1 - pct);
                         const val = Math.round(maxPeriodoVal * pct);
+
                         return (
                             <g key={idx}>
                                 <line x1="45" y1={y} x2={svgWidth - 10} y2={y} stroke="#f1f5f9" strokeWidth="1" />
@@ -394,10 +415,10 @@ export default function Relatorios({
                     </div>
                 </Paper>
 
-                {/* Seção 1: Processos por Status & Histórico Temporal */}
-                <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                {/* Seção 1: Processos por Status & Distribuição por Categoria */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* 1. Processos por Status (Proporção e Barras) */}
-                    <Paper className="p-6 border border-slate-100 rounded-2xl shadow-sm bg-white lg:col-span-2 flex flex-col justify-between">
+                    <Paper className="p-6 border border-slate-100 rounded-2xl shadow-sm bg-white flex flex-col justify-between">
                         <div>
                             <div className="flex justify-between items-start mb-1">
                                 <Typography variant="subtitle1" className="font-extrabold text-slate-800 flex items-center gap-2">
@@ -414,6 +435,7 @@ export default function Relatorios({
                             <div className="flex flex-col gap-4">
                                 {statusReport.map((item) => {
                                     const colors = getStatusColors(item.status);
+
                                     return (
                                         <div key={item.status} className="flex flex-col gap-1.5">
                                             <div className="flex justify-between items-center text-xs">
@@ -444,37 +466,88 @@ export default function Relatorios({
                         </div>
                     </Paper>
 
-                    {/* 2. Processos por Período (Gráfico de Barras Vertical) */}
-                    <Paper className="p-6 border border-slate-100 rounded-2xl shadow-sm bg-white lg:col-span-3 flex flex-col justify-between">
+                    {/* 2. Processos por Categoria (Proporção e Barras) */}
+                    <Paper className="p-6 border border-slate-100 rounded-2xl shadow-sm bg-white flex flex-col justify-between">
                         <div>
                             <div className="flex justify-between items-start mb-1">
                                 <Typography variant="subtitle1" className="font-extrabold text-slate-800 flex items-center gap-2">
-                                    <DateRangeIcon className="text-blue-600" /> Volume por Período
+                                    <AssessmentIcon className="text-purple-600" /> Distribuição por Categoria
                                 </Typography>
-                                <Button size="small" variant="text" onClick={handleExportPeriodo} startIcon={<DownloadIcon />} sx={{ textTransform: 'none', fontWeight: 700 }} className="text-xs!">
+                                <Button size="small" variant="text" onClick={handleExportCategoria} startIcon={<DownloadIcon />} sx={{ textTransform: 'none', fontWeight: 700 }} className="text-xs!">
                                     Exportar
                                 </Button>
                             </div>
                             <Typography variant="caption" className="text-slate-400 block mb-6">
-                                Relação entre processos criados e concluídos agrupados temporalmente.
+                                Volume absoluto e percentual de processos por categoria de documento.
                             </Typography>
 
-                            {renderPeriodChart()}
+                            <div className="flex flex-col gap-4 max-h-[260px] overflow-y-auto pr-1">
+                                {categoriaReport.length === 0 ? (
+                                    <div className="py-12 text-center text-slate-400 italic">
+                                        Nenhuma categoria registrada no período.
+                                    </div>
+                                ) : (
+                                    categoriaReport.map((item) => (
+                                        <div key={item.categoria} className="flex flex-col gap-1.5">
+                                            <div className="flex justify-between items-center text-xs">
+                                                <span className="font-bold text-slate-700">{item.categoria}</span>
+                                                <span className="font-mono font-semibold text-slate-500">
+                                                    {item.quantidade} ({item.percentual}%)
+                                                </span>
+                                            </div>
+                                            {/* Barra de Progresso Customizada (Gradiente Roxo/Violeta) */}
+                                            <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                                                <div
+                                                    className="h-full rounded-full bg-gradient-to-r from-violet-400 to-purple-600 transition-all duration-500"
+                                                    style={{ width: `${item.percentual}%` }}
+                                                />
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
                         </div>
 
-                        {/* Legenda do Gráfico */}
-                        <div className="mt-4 pt-3 border-t border-slate-100 flex gap-4 text-xs font-semibold">
-                            <div className="flex items-center gap-1.5">
-                                <span className="w-3.5 h-3.5 rounded bg-gradient-to-br from-blue-400 to-blue-600" />
-                                <span className="text-slate-600">Criados</span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                                <span className="w-3.5 h-3.5 rounded bg-gradient-to-br from-green-400 to-green-600" />
-                                <span className="text-slate-600">Concluídos</span>
-                            </div>
+                        {/* Legenda Resumida */}
+                        <div className="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center">
+                            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Categorias Ativas</span>
+                            <span className="font-mono text-sm font-extrabold text-slate-800">
+                                {categoriaReport.length} tipos de processos
+                            </span>
                         </div>
                     </Paper>
                 </div>
+
+                {/* Seção 2: Histórico Temporal (Volume por Período) */}
+                <Paper className="p-6 border border-slate-100 rounded-2xl shadow-sm bg-white flex flex-col justify-between">
+                    <div>
+                        <div className="flex justify-between items-start mb-1">
+                            <Typography variant="subtitle1" className="font-extrabold text-slate-800 flex items-center gap-2">
+                                <DateRangeIcon className="text-blue-600" /> Volume por Período
+                            </Typography>
+                            <Button size="small" variant="text" onClick={handleExportPeriodo} startIcon={<DownloadIcon />} sx={{ textTransform: 'none', fontWeight: 700 }} className="text-xs!">
+                                Exportar
+                            </Button>
+                        </div>
+                        <Typography variant="caption" className="text-slate-400 block mb-6">
+                            Relação entre processos criados e concluídos agrupados temporalmente.
+                        </Typography>
+
+                        {renderPeriodChart()}
+                    </div>
+
+                    {/* Legenda do Gráfico */}
+                    <div className="mt-4 pt-3 border-t border-slate-100 flex gap-4 text-xs font-semibold">
+                        <div className="flex items-center gap-1.5">
+                            <span className="w-3.5 h-3.5 rounded bg-gradient-to-br from-blue-400 to-blue-600" />
+                            <span className="text-slate-600">Criados</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                            <span className="w-3.5 h-3.5 rounded bg-gradient-to-br from-green-400 to-green-600" />
+                            <span className="text-slate-600">Concluídos</span>
+                        </div>
+                    </div>
+                </Paper>
 
                 {/* Seção 2: Produtividade por Signatário */}
                 <Paper className="p-6 border border-slate-100 rounded-2xl shadow-sm bg-white">

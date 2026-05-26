@@ -2,7 +2,9 @@
 
 namespace App\Http\Repositories;
 
+use App\Jobs\SendApprovalEmailJob;
 use App\Models\Processo;
+use App\Models\ProcessoHistorico;
 use App\Models\SignatarioProcesso;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -36,7 +38,7 @@ class ProcessoRepository
         array $signatarios
     ) {
         return DB::transaction(function () use ($usuarioId, $titulo, $descricao, $categoria, $url, $fluxoSequencial, $signatarios) {
-            $processo = new Processo();
+            $processo = new Processo;
             $processo->id = (string) Str::uuid();
             $processo->usuario_id = $usuarioId;
             $processo->titulo = $titulo;
@@ -50,7 +52,7 @@ class ProcessoRepository
             $processo->save();
 
             // Grava histórico de criação
-            $histCriacao = new \App\Models\ProcessoHistorico();
+            $histCriacao = new ProcessoHistorico;
             $histCriacao->id = (string) Str::uuid();
             $histCriacao->processo_id = $processo->id;
             $histCriacao->campo = 'status';
@@ -63,7 +65,7 @@ class ProcessoRepository
             $processo->updated_at = now();
             $processo->save();
 
-            $histTransicao = new \App\Models\ProcessoHistorico();
+            $histTransicao = new ProcessoHistorico;
             $histTransicao->id = (string) Str::uuid();
             $histTransicao->processo_id = $processo->id;
             $histTransicao->campo = 'status';
@@ -73,7 +75,7 @@ class ProcessoRepository
 
             $createdRelations = [];
             foreach ($signatarios as $index => $signatarioId) {
-                $relation = new SignatarioProcesso();
+                $relation = new SignatarioProcesso;
                 $relation->id = (string) Str::uuid();
                 $relation->signatario_id = $signatarioId;
                 $relation->processo_id = $processo->id;
@@ -92,7 +94,7 @@ class ProcessoRepository
                 $firstRelation->token_expira_em = now()->addDays(7);
                 $firstRelation->save();
 
-                \App\Jobs\SendApprovalEmailJob::dispatch($firstRelation->id);
+                SendApprovalEmailJob::dispatch($firstRelation->id);
             } else {
                 // Se paralelo, gera token e dispara para todos
                 foreach ($createdRelations as $relation) {
@@ -100,7 +102,7 @@ class ProcessoRepository
                     $relation->token_expira_em = now()->addDays(7);
                     $relation->save();
 
-                    \App\Jobs\SendApprovalEmailJob::dispatch($relation->id);
+                    SendApprovalEmailJob::dispatch($relation->id);
                 }
             }
 

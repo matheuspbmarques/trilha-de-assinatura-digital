@@ -2,8 +2,12 @@
 
 namespace App\Jobs;
 
+use App\Mail\ProcessoApprovalMail;
+use App\Models\SignatarioProcesso;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class SendApprovalEmailJob implements ShouldQueue
 {
@@ -24,9 +28,9 @@ class SendApprovalEmailJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $relation = \App\Models\SignatarioProcesso::with(['signatario', 'processo'])->find($this->signatarioProcessoId);
+        $relation = SignatarioProcesso::with(['signatario', 'processo'])->find($this->signatarioProcessoId);
 
-        if (!$relation) {
+        if (! $relation) {
             return;
         }
 
@@ -36,15 +40,15 @@ class SendApprovalEmailJob implements ShouldQueue
         }
 
         // Gera token se não existir
-        if (!$relation->token) {
-            $relation->token = \Illuminate\Support\Str::random(64);
+        if (! $relation->token) {
+            $relation->token = Str::random(64);
             $relation->token_expira_em = now()->addDays(7);
             $relation->save();
         }
 
         // Envia o e-mail
-        \Illuminate\Support\Facades\Mail::to($relation->signatario->email)->send(
-            new \App\Mail\ProcessoApprovalMail(
+        Mail::to($relation->signatario->email)->send(
+            new ProcessoApprovalMail(
                 $relation->signatario->nome,
                 $relation->processo->titulo,
                 $relation->processo->descricao,
@@ -57,14 +61,14 @@ class SendApprovalEmailJob implements ShouldQueue
         $fromName = config('mail.from.name', 'Trilha de Assinatura Digital');
         $linkAssinatura = route('processos.validar', ['token' => $relation->token]);
 
-        $logMsg = "\n======================================================================\n" .
-                  "📧 [E-MAIL DE ASSINATURA DISPARADO]\n" .
-                  " - De: {$fromName} <{$fromAddress}>\n" .
-                  " - Para: {$relation->signatario->nome} <{$relation->signatario->email}>\n" .
-                  " - Documento: {$relation->processo->titulo}\n" .
-                  " - Descrição: {$relation->processo->descricao}\n" .
-                  " - Link de Assinatura: {$linkAssinatura}\n" .
-                  " - Expiração do Link: {$relation->token_expira_em}\n" .
+        $logMsg = "\n======================================================================\n".
+                  "📧 [E-MAIL DE ASSINATURA DISPARADO]\n".
+                  " - De: {$fromName} <{$fromAddress}>\n".
+                  " - Para: {$relation->signatario->nome} <{$relation->signatario->email}>\n".
+                  " - Documento: {$relation->processo->titulo}\n".
+                  " - Descrição: {$relation->processo->descricao}\n".
+                  " - Link de Assinatura: {$linkAssinatura}\n".
+                  " - Expiração do Link: {$relation->token_expira_em}\n".
                   "======================================================================\n\n";
 
         if (defined('STDOUT')) {

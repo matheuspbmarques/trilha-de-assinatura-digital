@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Jobs\SendApprovalEmailJob;
+use App\Models\ProcessoHistorico;
 use App\Models\SignatarioProcesso;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 
 class ProcessoAssinaturaController
@@ -19,9 +22,9 @@ class ProcessoAssinaturaController
             ->with(['signatario', 'processo.signatariosAssoc.signatario'])
             ->first();
 
-        if (!$relation) {
+        if (! $relation) {
             return Inertia::render('processos/validar', [
-                'state' => 'invalid_token'
+                'state' => 'invalid_token',
             ]);
         }
 
@@ -32,7 +35,7 @@ class ProcessoAssinaturaController
             return Inertia::render('processos/validar', [
                 'state' => 'process_completed',
                 'processoStatus' => $processo->status,
-                'relation' => $relation
+                'relation' => $relation,
             ]);
         }
 
@@ -40,7 +43,7 @@ class ProcessoAssinaturaController
         if ($relation->status !== 'Pendente') {
             return Inertia::render('processos/validar', [
                 'state' => 'already_signed',
-                'relation' => $relation
+                'relation' => $relation,
             ]);
         }
 
@@ -48,7 +51,7 @@ class ProcessoAssinaturaController
         if ($relation->token_expira_em && now()->gt($relation->token_expira_em)) {
             return Inertia::render('processos/validar', [
                 'state' => 'expired',
-                'relation' => $relation
+                'relation' => $relation,
             ]);
         }
 
@@ -62,7 +65,7 @@ class ProcessoAssinaturaController
             if ($hasPreviousPending) {
                 return Inertia::render('processos/validar', [
                     'state' => 'waiting_turn',
-                    'relation' => $relation
+                    'relation' => $relation,
                 ]);
             }
         }
@@ -70,7 +73,7 @@ class ProcessoAssinaturaController
         // 5. Pronto para assinar
         return Inertia::render('processos/validar', [
             'state' => 'valid',
-            'relation' => $relation
+            'relation' => $relation,
         ]);
     }
 
@@ -83,7 +86,7 @@ class ProcessoAssinaturaController
             ->with(['signatario', 'processo'])
             ->first();
 
-        if (!$relation) {
+        if (! $relation) {
             abort(404, 'Token inválido');
         }
 
@@ -119,7 +122,7 @@ class ProcessoAssinaturaController
             'justificativa' => [
                 $request->input('decisao') === 'Reprovado' ? 'required' : 'nullable',
                 'string',
-                'max:1024'
+                'max:1024',
             ],
         ], [
             'decisao.required' => 'A decisão é obrigatória.',
@@ -145,8 +148,8 @@ class ProcessoAssinaturaController
             $relation->save();
 
             // Grava no histórico a resposta do signatário
-            $histAssinatura = new \App\Models\ProcessoHistorico();
-            $histAssinatura->id = (string) \Illuminate\Support\Str::uuid();
+            $histAssinatura = new ProcessoHistorico;
+            $histAssinatura->id = (string) Str::uuid();
             $histAssinatura->processo_id = $processo->id;
             $histAssinatura->campo = 'status';
             $histAssinatura->descricao = sprintf(
@@ -154,7 +157,7 @@ class ProcessoAssinaturaController
                 $relation->signatario->nome,
                 $relation->signatario->email,
                 $decisao,
-                $decisao === 'Reprovado' ? ' Justificativa: ' . $justificativa : '',
+                $decisao === 'Reprovado' ? ' Justificativa: '.$justificativa : '',
                 $request->ip()
             );
             $histAssinatura->created_at = now();
@@ -166,8 +169,8 @@ class ProcessoAssinaturaController
                 $processo->updated_at = now();
                 $processo->save();
 
-                $histReprovacao = new \App\Models\ProcessoHistorico();
-                $histReprovacao->id = (string) \Illuminate\Support\Str::uuid();
+                $histReprovacao = new ProcessoHistorico;
+                $histReprovacao->id = (string) Str::uuid();
                 $histReprovacao->processo_id = $processo->id;
                 $histReprovacao->campo = 'status';
                 $histReprovacao->descricao = 'Status do processo alterado para: Reprovado';
@@ -183,19 +186,19 @@ class ProcessoAssinaturaController
 
                     if ($nextRelation) {
                         // Gera token para o próximo e dispara e-mail
-                        $nextRelation->token = (string) \Illuminate\Support\Str::random(64);
+                        $nextRelation->token = (string) Str::random(64);
                         $nextRelation->token_expira_em = now()->addDays(7);
                         $nextRelation->save();
 
-                        \App\Jobs\SendApprovalEmailJob::dispatch($nextRelation->id);
+                        SendApprovalEmailJob::dispatch($nextRelation->id);
                     } else {
                         // Todos assinaram
                         $processo->status = 'Aprovado';
                         $processo->updated_at = now();
                         $processo->save();
 
-                        $histAprovacao = new \App\Models\ProcessoHistorico();
-                        $histAprovacao->id = (string) \Illuminate\Support\Str::uuid();
+                        $histAprovacao = new ProcessoHistorico;
+                        $histAprovacao->id = (string) Str::uuid();
                         $histAprovacao->processo_id = $processo->id;
                         $histAprovacao->campo = 'status';
                         $histAprovacao->descricao = 'Status do processo alterado para: Aprovado (todos os signatários assinaram)';
@@ -208,13 +211,13 @@ class ProcessoAssinaturaController
                         ->where('status', 'Pendente')
                         ->exists();
 
-                    if (!$hasPending) {
+                    if (! $hasPending) {
                         $processo->status = 'Aprovado';
                         $processo->updated_at = now();
                         $processo->save();
 
-                        $histAprovacao = new \App\Models\ProcessoHistorico();
-                        $histAprovacao->id = (string) \Illuminate\Support\Str::uuid();
+                        $histAprovacao = new ProcessoHistorico;
+                        $histAprovacao->id = (string) Str::uuid();
                         $histAprovacao->processo_id = $processo->id;
                         $histAprovacao->campo = 'status';
                         $histAprovacao->descricao = 'Status do processo alterado para: Aprovado (todos os signatários assinaram)';

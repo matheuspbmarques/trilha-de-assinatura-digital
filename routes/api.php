@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProcessoController;
 use App\Http\Controllers\SignatarioController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,8 +20,7 @@ Route::prefix('signatarios')->group(function () {
 });
 
 Route::prefix('processos')->group(function () {
-    Route::controller(App\Http\Controllers\ProcessoController::class)->group(function () {
+    Route::controller(ProcessoController::class)->group(function () {
         Route::post(null, 'store')->name('api.processos.store');
     });
 });
-

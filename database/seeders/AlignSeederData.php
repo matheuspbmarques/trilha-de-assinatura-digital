@@ -5,9 +5,9 @@ namespace Database\Seeders;
 use App\Models\Processo;
 use App\Models\ProcessoHistorico;
 use App\Models\SignatarioProcesso;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\DB;
 
 class AlignSeederData extends Seeder
 {
@@ -16,7 +16,7 @@ class AlignSeederData extends Seeder
      */
     public function run(): void
     {
-        $this->command->info("Aligning seeded processes with realistic signatory metadata...");
+        $this->command->info('Aligning seeded processes with realistic signatory metadata...');
 
         $totalUpdated = 0;
 
@@ -33,11 +33,11 @@ class AlignSeederData extends Seeder
                     continue;
                 }
 
-                $createdAt = \Carbon\Carbon::parse($processo->created_at);
-                $updatedAt = \Carbon\Carbon::parse($processo->updated_at);
+                $createdAt = Carbon::parse($processo->created_at);
+                $updatedAt = Carbon::parse($processo->updated_at);
 
                 // 1. Recreate initial history logs
-                $histCriacao = new ProcessoHistorico();
+                $histCriacao = new ProcessoHistorico;
                 $histCriacao->id = (string) Str::uuid();
                 $histCriacao->processo_id = $processo->id;
                 $histCriacao->campo = 'status';
@@ -45,7 +45,7 @@ class AlignSeederData extends Seeder
                 $histCriacao->created_at = $createdAt;
                 $histCriacao->save();
 
-                $histTransicao = new ProcessoHistorico();
+                $histTransicao = new ProcessoHistorico;
                 $histTransicao->id = (string) Str::uuid();
                 $histTransicao->processo_id = $processo->id;
                 $histTransicao->campo = 'status';
@@ -58,31 +58,31 @@ class AlignSeederData extends Seeder
                     $currTime = clone $createdAt;
                     $diffSec = max(0, $updatedAt->timestamp - $createdAt->timestamp);
                     // Distribute response times incrementally among signatories
-                    $stepSec = $signatariosAssoc->count() > 0 ? (int)($diffSec / $signatariosAssoc->count()) : 0;
+                    $stepSec = $signatariosAssoc->count() > 0 ? (int) ($diffSec / $signatariosAssoc->count()) : 0;
 
                     foreach ($signatariosAssoc as $index => $assoc) {
                         $respondidoEm = (clone $createdAt)->addSeconds($stepSec * ($index + 1));
-                        
+
                         $assoc->status = 'Aprovado';
                         $assoc->respondido_em = $respondidoEm;
                         $assoc->token_expira_em = (clone $respondidoEm)->addDays(7);
                         $assoc->token = (string) Str::random(64);
-                        $assoc->ip_requisicao = '192.168.1.' . rand(2, 254);
+                        $assoc->ip_requisicao = '192.168.1.'.rand(2, 254);
                         $assoc->user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
                         $assoc->save();
 
                         // Add history log for each signature
-                        $histSig = new ProcessoHistorico();
+                        $histSig = new ProcessoHistorico;
                         $histSig->id = (string) Str::uuid();
                         $histSig->processo_id = $processo->id;
                         $histSig->campo = 'status';
-                        $histSig->descricao = 'Processo assinado por ' . $assoc->signatario->nome;
+                        $histSig->descricao = 'Processo assinado por '.$assoc->signatario->nome;
                         $histSig->created_at = $respondidoEm;
                         $histSig->save();
                     }
 
                     // Add final approval history log
-                    $histAprovacao = new ProcessoHistorico();
+                    $histAprovacao = new ProcessoHistorico;
                     $histAprovacao->id = (string) Str::uuid();
                     $histAprovacao->processo_id = $processo->id;
                     $histAprovacao->campo = 'status';
@@ -97,7 +97,7 @@ class AlignSeederData extends Seeder
 
                     $rejectionTime = $updatedAt;
                     $diffSec = max(0, $rejectionTime->timestamp - $createdAt->timestamp);
-                    $stepSec = ($rejectIndex + 1) > 0 ? (int)($diffSec / ($rejectIndex + 1)) : 0;
+                    $stepSec = ($rejectIndex + 1) > 0 ? (int) ($diffSec / ($rejectIndex + 1)) : 0;
 
                     foreach ($signatariosAssoc as $index => $assoc) {
                         if ($index < $rejectIndex) {
@@ -107,15 +107,15 @@ class AlignSeederData extends Seeder
                             $assoc->respondido_em = $respondidoEm;
                             $assoc->token_expira_em = (clone $respondidoEm)->addDays(7);
                             $assoc->token = (string) Str::random(64);
-                            $assoc->ip_requisicao = '192.168.1.' . rand(2, 254);
+                            $assoc->ip_requisicao = '192.168.1.'.rand(2, 254);
                             $assoc->user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
                             $assoc->save();
 
-                            $histSig = new ProcessoHistorico();
+                            $histSig = new ProcessoHistorico;
                             $histSig->id = (string) Str::uuid();
                             $histSig->processo_id = $processo->id;
                             $histSig->campo = 'status';
-                            $histSig->descricao = 'Processo assinado por ' . $assoc->signatario->nome;
+                            $histSig->descricao = 'Processo assinado por '.$assoc->signatario->nome;
                             $histSig->created_at = $respondidoEm;
                             $histSig->save();
 
@@ -134,16 +134,16 @@ class AlignSeederData extends Seeder
                             $assoc->token_expira_em = (clone $rejectionTime)->addDays(7);
                             $assoc->token = (string) Str::random(64);
                             $assoc->justificativa = $justificativas[array_rand($justificativas)];
-                            $assoc->ip_requisicao = '192.168.1.' . rand(2, 254);
+                            $assoc->ip_requisicao = '192.168.1.'.rand(2, 254);
                             $assoc->user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
                             $assoc->save();
 
                             // Rejection history log
-                            $histReprovacao = new ProcessoHistorico();
+                            $histReprovacao = new ProcessoHistorico;
                             $histReprovacao->id = (string) Str::uuid();
                             $histReprovacao->processo_id = $processo->id;
                             $histReprovacao->campo = 'status';
-                            $histReprovacao->descricao = 'Status do processo alterado para: Reprovado (por signatário: ' . $assoc->signatario->nome . ' - Justificativa: ' . $assoc->justificativa . ')';
+                            $histReprovacao->descricao = 'Status do processo alterado para: Reprovado (por signatário: '.$assoc->signatario->nome.' - Justificativa: '.$assoc->justificativa.')';
                             $histReprovacao->created_at = $rejectionTime;
                             $histReprovacao->save();
 
@@ -174,15 +174,15 @@ class AlignSeederData extends Seeder
                                 $assoc->respondido_em = $currTime;
                                 $assoc->token_expira_em = (clone $currTime)->addDays(7);
                                 $assoc->token = (string) Str::random(64);
-                                $assoc->ip_requisicao = '192.168.1.' . rand(2, 254);
+                                $assoc->ip_requisicao = '192.168.1.'.rand(2, 254);
                                 $assoc->user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
                                 $assoc->save();
 
-                                $histSig = new ProcessoHistorico();
+                                $histSig = new ProcessoHistorico;
                                 $histSig->id = (string) Str::uuid();
                                 $histSig->processo_id = $processo->id;
                                 $histSig->campo = 'status';
-                                $histSig->descricao = 'Processo assinado por ' . $assoc->signatario->nome;
+                                $histSig->descricao = 'Processo assinado por '.$assoc->signatario->nome;
                                 $histSig->created_at = $currTime;
                                 $histSig->save();
                             } elseif ($index === $approvedCount) {
@@ -217,15 +217,15 @@ class AlignSeederData extends Seeder
                                 $assoc->respondido_em = $respondidoEm;
                                 $assoc->token_expira_em = (clone $respondidoEm)->addDays(7);
                                 $assoc->token = (string) Str::random(64);
-                                $assoc->ip_requisicao = '192.168.1.' . rand(2, 254);
+                                $assoc->ip_requisicao = '192.168.1.'.rand(2, 254);
                                 $assoc->user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36';
                                 $assoc->save();
 
-                                $histSig = new ProcessoHistorico();
+                                $histSig = new ProcessoHistorico;
                                 $histSig->id = (string) Str::uuid();
                                 $histSig->processo_id = $processo->id;
                                 $histSig->campo = 'status';
-                                $histSig->descricao = 'Processo assinado por ' . $assoc->signatario->nome;
+                                $histSig->descricao = 'Processo assinado por '.$assoc->signatario->nome;
                                 $histSig->created_at = $respondidoEm;
                                 $histSig->save();
                             } else {

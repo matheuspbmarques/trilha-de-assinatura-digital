@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
@@ -15,8 +14,11 @@ class ProcessoApprovalMail extends Mailable
     use Queueable, SerializesModels;
 
     public string $signatarioNome;
+
     public string $processoTitulo;
+
     public string $processoDescricao;
+
     public string $urlAssinatura;
 
     /**
@@ -36,7 +38,7 @@ class ProcessoApprovalMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Solicitação de Assinatura: ' . $this->processoTitulo,
+            subject: 'Solicitação de Assinatura: '.$this->processoTitulo,
         );
     }
 

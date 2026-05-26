@@ -74,7 +74,10 @@ export default function Validar({ state, relation, processoStatus }: TValidarPag
     const [loading, setLoading] = useState(false);
 
     const formatDateTime = (dateStr: string | null | undefined) => {
-        if (!dateStr) return '';
+        if (!dateStr) {
+return '';
+}
+
         return new Date(dateStr).toLocaleString('pt-BR', {
             day: '2-digit',
             month: '2-digit',
@@ -97,16 +100,21 @@ export default function Validar({ state, relation, processoStatus }: TValidarPag
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!relation) return;
+
+        if (!relation) {
+return;
+}
 
         // Validations
         const newErrors: { justificativa?: string } = {};
+
         if (decisao === 'Reprovado' && !justificativa.trim()) {
             newErrors.justificativa = 'A justificativa é obrigatória ao reprovar o processo.';
         }
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
+
             return;
         }
 
@@ -266,6 +274,7 @@ export default function Validar({ state, relation, processoStatus }: TValidarPag
 
     if (state === 'already_signed' && relation) {
         const approved = relation.status === 'Aprovado';
+
         return (
             <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
                 <Paper className="max-w-md w-full p-8 text-center border border-slate-100 rounded-2xl shadow-md">
@@ -481,6 +490,7 @@ export default function Validar({ state, relation, processoStatus }: TValidarPag
                                 <ul className="flex flex-col gap-3">
                                     {processo.signatarios_assoc?.map((assoc, idx) => {
                                         const isCurrent = assoc.signatario.id === signatario.id;
+
                                         return (
                                             <li
                                                 key={assoc.id}

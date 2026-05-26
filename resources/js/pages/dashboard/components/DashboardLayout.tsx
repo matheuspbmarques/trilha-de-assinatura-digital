@@ -1,8 +1,8 @@
 import { router } from '@inertiajs/react';
+import BarChartIcon from '@mui/icons-material/BarChart';
 import FilePresentIcon from '@mui/icons-material/FilePresent';
 import HomeFilledIcon from '@mui/icons-material/HomeFilled';
 import PeopleIcon from '@mui/icons-material/People';
-import BarChartIcon from '@mui/icons-material/BarChart';
 import {
     List,
     ListItem,

@@ -1,11 +1,11 @@
-import { Divider, Typography, Chip, Box, Button } from '@mui/material';
-import DescriptionIcon from '@mui/icons-material/Description';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import DescriptionIcon from '@mui/icons-material/Description';
 import ErrorIcon from '@mui/icons-material/Error';
+import HistoryIcon from '@mui/icons-material/History';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import LaunchIcon from '@mui/icons-material/Launch';
-import HistoryIcon from '@mui/icons-material/History';
 import SecurityIcon from '@mui/icons-material/Security';
+import { Divider, Typography, Chip, Box, Button } from '@mui/material';
 import { Modal } from '@/components/Modal';
 
 type TSignatario = {
@@ -55,10 +55,15 @@ type TProcessoDetalhesModalProps = {
 };
 
 export function ProcessoDetalhesModal({ open, onClose, processo }: TProcessoDetalhesModalProps) {
-    if (!processo) return null;
+    if (!processo) {
+return null;
+}
 
     const formatDateTime = (dateStr: string | null | undefined) => {
-        if (!dateStr) return '';
+        if (!dateStr) {
+return '';
+}
+
         return new Date(dateStr).toLocaleString('pt-BR', {
             day: '2-digit',
             month: '2-digit',

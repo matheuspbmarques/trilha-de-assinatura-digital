@@ -4,14 +4,14 @@ import ErrorIcon from '@mui/icons-material/Error';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import FolderIcon from '@mui/icons-material/Folder';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import LaunchIcon from '@mui/icons-material/Launch';
 import LoopIcon from '@mui/icons-material/Loop';
 import PauseCircleIcon from '@mui/icons-material/PauseCircle';
 import SearchIcon from '@mui/icons-material/Search';
 import TimerIcon from '@mui/icons-material/Timer';
 import WarningIcon from '@mui/icons-material/Warning';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import {
     Paper,
     Typography,
@@ -38,8 +38,8 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 import DashboardLayout from './components/DashboardLayout';
-import { Title } from './components/Title';
 import { ProcessoDetalhesModal } from './components/Modals/ProcessoDetalhesModal';
+import { Title } from './components/Title';
 
 type TSignatario = {
     id: string;
@@ -193,7 +193,10 @@ export default function Home({
     };
 
     const formatDateTime = (dateStr: string | null | undefined) => {
-        if (!dateStr) return '';
+        if (!dateStr) {
+return '';
+}
+
         return new Date(dateStr).toLocaleDateString('pt-BR', {
             day: '2-digit',
             month: '2-digit',
