@@ -1,15 +1,15 @@
 import { router } from '@inertiajs/react';
-import FilePresentIcon from '@mui/icons-material/FilePresent';
 import AddIcon from '@mui/icons-material/Add';
+import FilePresentIcon from '@mui/icons-material/FilePresent';
 import { Pagination, Box, Typography, Button } from '@mui/material';
 import { useState } from 'react';
+import { IconButton } from '@/components/IconButton';
 import type { TPaginatedProcessos } from '@/types/processos.types';
 import type { TSignatario } from '@/types/signatarios.types';
 import DashboardLayout from './components/DashboardLayout';
+import { AddProcessoModal } from './components/Modals/AddProcessoModal';
 import { ProcessoCard } from './components/ProcessoCard';
 import { Title } from './components/Title';
-import { IconButton } from '@/components/IconButton';
-import { AddProcessoModal } from './components/Modals/AddProcessoModal';
 
 type TProcessosPageProps = {
     processos: TPaginatedProcessos;

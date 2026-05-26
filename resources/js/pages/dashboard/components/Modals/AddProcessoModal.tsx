@@ -20,8 +20,8 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Modal } from '@/components/Modal';
 import { IconButton } from '@/components/IconButton';
+import { Modal } from '@/components/Modal';
 import type { TSignatario } from '@/types/signatarios.types';
 
 type TAddProcessoModalProps = {
@@ -58,6 +58,7 @@ export function AddProcessoModal({ open, onClose, onCreate, signatarios }: TAddP
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFileError('');
         clearErrors('arquivo');
+
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             const maxSize = 5 * 1024 * 1024; // 5MB
@@ -69,12 +70,14 @@ export function AddProcessoModal({ open, onClose, onCreate, signatarios }: TAddP
             if (!allowedExtensions.includes(fileExtension)) {
                 setFileError('O arquivo deve ser PDF ou imagem (jpeg, png, jpg).');
                 setData('arquivo', null);
+
                 return;
             }
 
             if (file.size > maxSize) {
                 setFileError('O arquivo excede o tamanho máximo de 5MB.');
                 setData('arquivo', null);
+
                 return;
             }
 
@@ -100,7 +103,10 @@ export function AddProcessoModal({ open, onClose, onCreate, signatarios }: TAddP
     };
 
     const moveUp = (index: number) => {
-        if (index === 0) return;
+        if (index === 0) {
+return;
+}
+
         const newList = [...data.signatarios];
         const temp = newList[index];
         newList[index] = newList[index - 1];
@@ -109,7 +115,10 @@ export function AddProcessoModal({ open, onClose, onCreate, signatarios }: TAddP
     };
 
     const moveDown = (index: number) => {
-        if (index === data.signatarios.length - 1) return;
+        if (index === data.signatarios.length - 1) {
+return;
+}
+
         const newList = [...data.signatarios];
         const temp = newList[index];
         newList[index] = newList[index + 1];
@@ -140,6 +149,7 @@ export function AddProcessoModal({ open, onClose, onCreate, signatarios }: TAddP
             s.cargo.toLowerCase().includes(query) ||
             s.setor.toLowerCase().includes(query);
         const isNotSelected = !data.signatarios.includes(s.id);
+
         return matchesQuery && isNotSelected;
     });
 
@@ -149,11 +159,15 @@ export function AddProcessoModal({ open, onClose, onCreate, signatarios }: TAddP
         .filter((s): s is TSignatario => !!s);
 
     const formatBytes = (bytes: number) => {
-        if (bytes === 0) return '0 Bytes';
+        if (bytes === 0) {
+return '0 Bytes';
+}
+
         const k = 1024;
         const dm = 2;
         const sizes = ['Bytes', 'KB', 'MB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
+
         return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
     };
 

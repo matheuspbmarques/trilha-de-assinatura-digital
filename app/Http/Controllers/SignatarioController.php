@@ -39,9 +39,9 @@ class SignatarioController
         return $this->signatarioService->create($request);
     }
 
-    public function getAll()
+    public function getAll(Request $request)
     {
-        $signatarios = $this->signatarioService->getAll();
+        $signatarios = $this->signatarioService->getPaginated(12);
 
         return Inertia::render('dashboard/signatarios', [
             'signatarios' => $signatarios,

@@ -1,6 +1,7 @@
 import { useForm } from '@inertiajs/react';
 import { Button, TextField, Switch, FormControlLabel } from '@mui/material';
-import type { SubmitEventHandler} from 'react';
+import { useEffect } from 'react';
+import type { SubmitEventHandler } from 'react';
 import { Modal } from '@/components/Modal';
 import type { TSignatario } from '@/types/signatarios.types';
 
@@ -22,8 +23,24 @@ export function AddSignatarioModal({
         email: signatario?.email || '',
         cargo: signatario?.cargo || '',
         setor: signatario?.setor || '',
-        ativo: signatario?.ativo || true as boolean,
+        ativo: signatario?.ativo ?? true,
     });
+
+    useEffect(() => {
+        if (open) {
+            setData({
+                nome: signatario?.nome || '',
+                email: signatario?.email || '',
+                cargo: signatario?.cargo || '',
+                setor: signatario?.setor || '',
+                ativo: signatario?.ativo ?? true,
+            });
+            clearErrors();
+        } else {
+            reset();
+            clearErrors();
+        }
+    }, [signatario, open, setData, clearErrors, reset]);
 
     const submit: SubmitEventHandler<HTMLFormElement> = (e) => {
         e.preventDefault();

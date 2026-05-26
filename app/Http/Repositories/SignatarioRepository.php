@@ -26,6 +26,11 @@ class SignatarioRepository
         return Signatario::orderBy('created_at', 'asc')->get();
     }
 
+    public function paginate(int $perPage = 12)
+    {
+        return Signatario::orderBy('created_at', 'asc')->paginate($perPage);
+    }
+
     public function updateById(string $id, string $nome, string $email, string $cargo, string $setor, bool $ativo)
     {
         $signatario = Signatario::whereId($id)->first();

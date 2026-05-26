@@ -31,6 +31,11 @@ class SignatarioService
         return $this->signatarioRepository->findAll();
     }
 
+    public function getPaginated(int $perPage = 12)
+    {
+        return $this->signatarioRepository->paginate($perPage);
+    }
+
     public function update(string $id, Request $request)
     {
         $nome = $request->input('nome');
