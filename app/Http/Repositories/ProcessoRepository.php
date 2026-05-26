@@ -20,7 +20,7 @@ class ProcessoRepository
     public function paginateByUsuarioId(string $usuarioId, int $perPage = 12)
     {
         return Processo::where('usuario_id', $usuarioId)
-            ->with(['historico', 'signatariosAssoc.signatario'])
+            ->with(['historico', 'auditorias.usuario', 'auditorias.signatario', 'signatariosAssoc.signatario'])
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
     }
@@ -60,6 +60,25 @@ class ProcessoRepository
             $histCriacao->created_at = now();
             $histCriacao->save();
 
+            // Registra auditoria de criação
+            \App\Models\ProcessoAuditoria::registrar(
+                $processo->id,
+                'Criação',
+                'Processo criado por usuário.',
+                $usuarioId,
+                null,
+                null,
+                [
+                    'titulo' => $titulo,
+                    'descricao' => $descricao,
+                    'categoria' => $categoria,
+                    'url' => $url,
+                    'fluxo_sequencial' => $fluxoSequencial,
+                    'status' => 'Pendente',
+                    'signatarios' => $signatarios
+                ]
+            );
+
             // Transiciona para "Em aprovação"
             $processo->status = 'Em aprovação';
             $processo->updated_at = now();
@@ -72,6 +91,17 @@ class ProcessoRepository
             $histTransicao->descricao = 'Status alterado para: Em aprovação. Iniciando fluxo de assinaturas.';
             $histTransicao->created_at = now();
             $histTransicao->save();
+
+            // Registra auditoria de transição de status
+            \App\Models\ProcessoAuditoria::registrar(
+                $processo->id,
+                'Alteração de Status',
+                'Status alterado para: Em aprovação. Iniciando fluxo de assinaturas.',
+                null,
+                null,
+                ['status' => 'Pendente'],
+                ['status' => 'Em aprovação']
+            );
 
             $createdRelations = [];
             foreach ($signatarios as $index => $signatarioId) {

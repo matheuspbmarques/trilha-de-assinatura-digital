@@ -28,8 +28,8 @@ class RelatorioController
         $agrupamento = $request->input('agrupamento', 'dia'); // dia, semana, mes
 
         // Default: últimos 30 dias
-        $dataInicio = $dataInicioRaw ? Carbon::parse($dataInicioRaw)->startOfDay() : now()->subDays(30)->startOfDay();
-        $dataFim = $dataFimRaw ? Carbon::parse($dataFimRaw)->endOfDay() : now()->endOfDay();
+        $dataInicio = $dataInicioRaw ? Carbon::parse($dataInicioRaw)->startOfDay() : Carbon::now()->subDays(30)->startOfDay();
+        $dataFim = $dataFimRaw ? Carbon::parse($dataFimRaw)->endOfDay() : Carbon::now()->endOfDay();
 
         $analyticsService = new AnalyticsService;
 

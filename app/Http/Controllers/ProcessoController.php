@@ -97,4 +97,110 @@ class ProcessoController
 
         return back();
     }
+
+    /**
+     * Cancela o processo de assinatura.
+     */
+    public function cancelar(string $id, Request $request)
+    {
+        $usuarioId = $request->session()->get('USUARIO_ID');
+        if (! $usuarioId) {
+            abort(401, 'Não autorizado');
+        }
+
+        $processo = \App\Models\Processo::where('id', $id)
+            ->where('usuario_id', $usuarioId)
+            ->firstOrFail();
+
+        if (in_array($processo->status, ['Aprovado', 'Reprovado', 'Cancelado'])) {
+            return back()->withErrors(['error' => 'Este processo já foi finalizado e não pode ser cancelado.']);
+        }
+
+        $statusAnterior = $processo->status;
+
+        \DB::transaction(function () use ($processo, $usuarioId, $statusAnterior) {
+            $processo->status = 'Cancelado';
+            $processo->updated_at = now();
+            $processo->save();
+
+            // Histórico legado
+            $hist = new \App\Models\ProcessoHistorico;
+            $hist->id = (string) \Illuminate\Support\Str::uuid();
+            $hist->processo_id = $processo->id;
+            $hist->campo = 'status';
+            $hist->descricao = 'Processo cancelado pelo usuário.';
+            $hist->created_at = now();
+            $hist->save();
+
+            // Auditoria detalhada
+            \App\Models\ProcessoAuditoria::registrar(
+                $processo->id,
+                'Cancelamento',
+                'Processo cancelado pelo usuário.',
+                $usuarioId,
+                null,
+                ['status' => $statusAnterior],
+                ['status' => 'Cancelado']
+            );
+        });
+
+        return back();
+    }
+
+    /**
+     * Reenvia e-mail com novo token de assinatura para um signatário pendente.
+     */
+    public function reenviarEmail(string $id, string $relationId, Request $request)
+    {
+        $usuarioId = $request->session()->get('USUARIO_ID');
+        if (! $usuarioId) {
+            abort(401, 'Não autorizado');
+        }
+
+        $processo = \App\Models\Processo::where('id', $id)
+            ->where('usuario_id', $usuarioId)
+            ->firstOrFail();
+
+        $relation = \App\Models\SignatarioProcesso::where('id', $relationId)
+            ->where('processo_id', $processo->id)
+            ->with('signatario')
+            ->firstOrFail();
+
+        if ($relation->status !== 'Pendente') {
+            return back()->withErrors(['error' => 'Este signatário já respondeu ao processo.']);
+        }
+
+        if (in_array($processo->status, ['Aprovado', 'Reprovado', 'Cancelado'])) {
+            return back()->withErrors(['error' => 'O processo já foi finalizado.']);
+        }
+
+        \DB::transaction(function () use ($processo, $relation, $usuarioId) {
+            // Regenera token e estende validade
+            $relation->token = (string) \Illuminate\Support\Str::random(64);
+            $relation->token_expira_em = now()->addDays(7);
+            $relation->save();
+
+            // Dispara e-mail
+            \App\Jobs\SendApprovalEmailJob::dispatch($relation->id);
+
+            // Registra auditoria
+            \App\Models\ProcessoAuditoria::registrar(
+                $processo->id,
+                'Reenvio de E-mail',
+                sprintf('Link de assinatura reenviado para o signatário %s (%s).', $relation->signatario->nome, $relation->signatario->email),
+                $usuarioId,
+                null,
+                null,
+                [
+                    'signatario' => [
+                        'id' => $relation->signatario_id,
+                        'nome' => $relation->signatario->nome,
+                        'email' => $relation->signatario->email
+                    ]
+                ]
+            );
+        });
+
+        return back();
+    }
 }

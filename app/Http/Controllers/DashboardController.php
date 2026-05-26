@@ -39,7 +39,7 @@ class DashboardController
 
         // 4. Listagem Filtrada de Processos
         $listQuery = Processo::where('usuario_id', $usuarioId)
-            ->with(['historico', 'signatariosAssoc.signatario']);
+            ->with(['historico', 'auditorias.usuario', 'auditorias.signatario', 'signatariosAssoc.signatario']);
 
         if ($status) {
             $listQuery->where('status', $status);

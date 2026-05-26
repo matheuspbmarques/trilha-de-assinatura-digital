@@ -30,6 +30,8 @@ Route::middleware(AuthMiddleware::class)->group(function () {
 
         Route::controller(ProcessoController::class)->group(function () {
             Route::get('processos', 'getAll')->name('dashboard.processos');
+            Route::post('processos/{id}/cancelar', 'cancelar')->name('dashboard.processos.cancelar');
+            Route::post('processos/{id}/reenviar-email/{relationId}', 'reenviarEmail')->name('dashboard.processos.reenviar-email');
         });
     });
 });

@@ -46,6 +46,11 @@ class Processo extends Model
         return $this->hasMany(ProcessoHistorico::class, 'processo_id')->orderBy('created_at', 'desc');
     }
 
+    public function auditorias()
+    {
+        return $this->hasMany(ProcessoAuditoria::class, 'processo_id')->orderBy('created_at', 'desc');
+    }
+
     public function signatariosAssoc()
     {
         return $this->hasMany(SignatarioProcesso::class, 'processo_id')->orderBy('ordem_assinatura', 'asc')->orderBy('created_at', 'asc');

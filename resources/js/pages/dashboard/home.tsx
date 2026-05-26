@@ -621,7 +621,7 @@ return '';
                     setDetailsOpen(false);
                     setSelectedProcesso(null);
                 }}
-                processo={selectedProcesso}
+                processo={processos.data.find(p => p.id === selectedProcesso?.id) || selectedProcesso}
             />
         </DashboardLayout>
     );

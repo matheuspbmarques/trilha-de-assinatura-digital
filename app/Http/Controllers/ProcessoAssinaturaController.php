@@ -163,8 +163,27 @@ class ProcessoAssinaturaController
             $histAssinatura->created_at = now();
             $histAssinatura->save();
 
+            // Registra auditoria da assinatura
+            \App\Models\ProcessoAuditoria::registrar(
+                $processo->id,
+                $decisao === 'Reprovado' ? 'Reprovação' : 'Aprovação',
+                sprintf(
+                    'Signatário %s (%s) respondeu como: %s.%s (IP: %s)',
+                    $relation->signatario->nome,
+                    $relation->signatario->email,
+                    $decisao,
+                    $decisao === 'Reprovado' ? ' Justificativa: '.$justificativa : '',
+                    $request->ip()
+                ),
+                null,
+                $relation->signatario_id,
+                ['status' => 'Pendente'],
+                $decisao === 'Reprovado' ? ['status' => 'Reprovado', 'justificativa' => $justificativa] : ['status' => 'Aprovado']
+            );
+
             // Atualiza status do processo
             if ($decisao === 'Reprovado') {
+                $statusAnterior = $processo->status;
                 $processo->status = 'Reprovado';
                 $processo->updated_at = now();
                 $processo->save();
@@ -176,6 +195,17 @@ class ProcessoAssinaturaController
                 $histReprovacao->descricao = 'Status do processo alterado para: Reprovado';
                 $histReprovacao->created_at = now();
                 $histReprovacao->save();
+
+                // Registra auditoria de alteração de status
+                \App\Models\ProcessoAuditoria::registrar(
+                    $processo->id,
+                    'Alteração de Status',
+                    'Status do processo alterado para: Reprovado',
+                    null,
+                    null,
+                    ['status' => $statusAnterior],
+                    ['status' => 'Reprovado']
+                );
             } else {
                 // Aprovado
                 if ($processo->fluxo_sequencial) {
@@ -193,6 +223,7 @@ class ProcessoAssinaturaController
                         SendApprovalEmailJob::dispatch($nextRelation->id);
                     } else {
                         // Todos assinaram
+                        $statusAnterior = $processo->status;
                         $processo->status = 'Aprovado';
                         $processo->updated_at = now();
                         $processo->save();
@@ -204,6 +235,17 @@ class ProcessoAssinaturaController
                         $histAprovacao->descricao = 'Status do processo alterado para: Aprovado (todos os signatários assinaram)';
                         $histAprovacao->created_at = now();
                         $histAprovacao->save();
+
+                        // Registra auditoria de alteração de status
+                        \App\Models\ProcessoAuditoria::registrar(
+                            $processo->id,
+                            'Alteração de Status',
+                            'Status do processo alterado para: Aprovado (todos os signatários assinaram)',
+                            null,
+                            null,
+                            ['status' => $statusAnterior],
+                            ['status' => 'Aprovado']
+                        );
                     }
                 } else {
                     // Paralelo: verifica se restam pendentes
@@ -212,6 +254,7 @@ class ProcessoAssinaturaController
                         ->exists();
 
                     if (! $hasPending) {
+                        $statusAnterior = $processo->status;
                         $processo->status = 'Aprovado';
                         $processo->updated_at = now();
                         $processo->save();
@@ -223,6 +266,17 @@ class ProcessoAssinaturaController
                         $histAprovacao->descricao = 'Status do processo alterado para: Aprovado (todos os signatários assinaram)';
                         $histAprovacao->created_at = now();
                         $histAprovacao->save();
+
+                        // Registra auditoria de alteração de status
+                        \App\Models\ProcessoAuditoria::registrar(
+                            $processo->id,
+                            'Alteração de Status',
+                            'Status do processo alterado para: Aprovado (todos os signatários assinaram)',
+                            null,
+                            null,
+                            ['status' => $statusAnterior],
+                            ['status' => 'Aprovado']
+                        );
                     }
                 }
             }
