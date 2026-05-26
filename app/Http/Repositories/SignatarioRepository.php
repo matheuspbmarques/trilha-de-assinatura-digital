@@ -3,10 +3,13 @@
 namespace App\Http\Repositories;
 
 use App\Models\Signatario;
+use App\Models\SignatarioHistorico;
 
-class SignatarioRepository {
-    public function createNew(string $nome, string $email, string $cargo, string $setor) {
-        $newSignatario = new Signatario();
+class SignatarioRepository
+{
+    public function createNew(string $nome, string $email, string $cargo, string $setor)
+    {
+        $newSignatario = new Signatario;
 
         $newSignatario->nome = $nome;
         $newSignatario->email = $email;
@@ -18,14 +21,16 @@ class SignatarioRepository {
         $newSignatario->save();
     }
 
-    public function findAll() {
+    public function findAll()
+    {
         return Signatario::orderBy('created_at', 'asc')->get();
     }
 
-    public function updateById(string $id, string $nome, string $email, string $cargo, string $setor, bool $ativo) {
+    public function updateById(string $id, string $nome, string $email, string $cargo, string $setor, bool $ativo)
+    {
         $signatario = Signatario::whereId($id)->first();
 
-        if (!$signatario) {
+        if (! $signatario) {
             abort(404, 'Signatário não encontrado');
         }
 
@@ -63,22 +68,22 @@ class SignatarioRepository {
             $signatario->setor = $setor;
         }
 
-        $ativoBool = (bool)$ativo;
+        $ativoBool = (bool) $ativo;
 
-        if ((bool)$signatario->ativo !== $ativoBool) {
+        if ((bool) $signatario->ativo !== $ativoBool) {
             $changes[] = [
                 'campo' => 'ativo',
-                'descricao' => "Status alterado de '" . ($signatario->ativo ? 'ativo' : 'inativo') . "' para '" . ($ativoBool ? 'ativo' : 'inativo') . "'",
+                'descricao' => "Status alterado de '".($signatario->ativo ? 'ativo' : 'inativo')."' para '".($ativoBool ? 'ativo' : 'inativo')."'",
             ];
             $signatario->ativo = $ativoBool;
         }
 
-        if (!empty($changes)) {
+        if (! empty($changes)) {
             $signatario->updated_at = now();
             $signatario->save();
 
             foreach ($changes as $change) {
-                $historico = new \App\Models\SignatarioHistorico();
+                $historico = new SignatarioHistorico;
                 $historico->signatario_id = $signatario->id;
                 $historico->campo = $change['campo'];
                 $historico->descricao = $change['descricao'];

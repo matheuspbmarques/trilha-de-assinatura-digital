@@ -11,8 +11,8 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-Route::prefix('signatarios')->group(function() {
-    Route::controller(SignatarioController::class)->group(function() {
+Route::prefix('signatarios')->group(function () {
+    Route::controller(SignatarioController::class)->group(function () {
         Route::post(null, 'create')->name('api.signatario.create');
         Route::put('{id}', 'update')->name('api.signatario.update');
     });

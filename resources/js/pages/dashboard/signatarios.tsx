@@ -1,12 +1,12 @@
-import DashboardLayout from './components/DashboardLayout';
-import { Title } from './components/Title';
-import { Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-import { AddSignatarioModal } from './components/Modals/AddSignatarioModal';
+import { Button } from '@mui/material';
 import { useState } from 'react';
 import { IconButton } from '@/components/IconButton';
-import { TSignatario } from '@/types/signatarios.types';
+import type { TSignatario } from '@/types/signatarios.types';
+import DashboardLayout from './components/DashboardLayout';
+import { AddSignatarioModal } from './components/Modals/AddSignatarioModal';
 import { SignatarioCard } from './components/SignatarioCard';
+import { Title } from './components/Title';
 
 export default function Signatarios({
     signatarios,

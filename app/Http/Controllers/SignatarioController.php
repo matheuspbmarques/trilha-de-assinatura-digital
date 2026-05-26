@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Services\SignatarioService;
-use Error;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
@@ -12,11 +11,13 @@ class SignatarioController
 {
     private SignatarioService $signatarioService;
 
-    public function __construct() {
-        $this->signatarioService = new SignatarioService();
+    public function __construct()
+    {
+        $this->signatarioService = new SignatarioService;
     }
 
-    public function create(Request $request) {
+    public function create(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'nome' => ['required'],
             'email' => ['required', 'email', 'unique:signatarios,email'],
@@ -38,7 +39,8 @@ class SignatarioController
         return $this->signatarioService->create($request);
     }
 
-    public function getAll() {
+    public function getAll()
+    {
         $signatarios = $this->signatarioService->getAll();
 
         return Inertia::render('dashboard/signatarios', [
@@ -46,7 +48,8 @@ class SignatarioController
         ]);
     }
 
-    public function update(Request $request, string $id) {
+    public function update(Request $request, string $id)
+    {
         $validator = Validator::make(array_merge($request->all(), ['id' => $id]), [
             'id' => ['required', 'uuid:4'],
             'nome' => ['required'],

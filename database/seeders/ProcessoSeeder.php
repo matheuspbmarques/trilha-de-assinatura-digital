@@ -7,7 +7,9 @@ use App\Models\ProcessoHistorico;
 use App\Models\Signatario;
 use App\Models\SignatarioProcesso;
 use App\Models\Usuario;
+use Faker\Factory;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class ProcessoSeeder extends Seeder
 {
@@ -16,12 +18,12 @@ class ProcessoSeeder extends Seeder
      */
     public function run(): void
     {
-        $faker = \Faker\Factory::create('pt_BR');
+        $faker = Factory::create('pt_BR');
 
         // Get the test user
         $usuario = Usuario::where('acesso', 'test')->first();
-        if (!$usuario) {
-            $seeder = new CreateUsuarioSeeder();
+        if (! $usuario) {
+            $seeder = new CreateUsuarioSeeder;
             $seeder->run();
             $usuario = Usuario::where('acesso', 'test')->first();
         }
@@ -31,7 +33,7 @@ class ProcessoSeeder extends Seeder
         // Get all signatories to associate with processes
         $signatarios = Signatario::all();
         if ($signatarios->isEmpty()) {
-            $seeder = new SignatarioSeeder();
+            $seeder = new SignatarioSeeder;
             $seeder->run();
             $signatarios = Signatario::all();
         }
@@ -39,7 +41,7 @@ class ProcessoSeeder extends Seeder
 
         $categorias = ['Contratos', 'Recursos Humanos', 'Financeiro', 'Jurídico', 'Compras', 'Vendas', 'Administrativo', 'Tecnologia'];
         $statusOptions = ['Pendente', 'Em aprovação', 'Aprovado', 'Reprovado', 'Cancelado'];
-        
+
         $documentTypes = [
             'Contrato de Prestação de Serviços',
             'Aditivo de Contrato Trabalho',
@@ -50,19 +52,19 @@ class ProcessoSeeder extends Seeder
             'Orçamento de Compras',
             'Termo de Quitação',
             'Autorização de Pagamento',
-            'Declaração de Conformidade'
+            'Declaração de Conformidade',
         ];
 
         for ($i = 0; $i < 1000; $i++) {
-            $processo = new Processo();
-            $processo->id = (string) \Illuminate\Support\Str::uuid();
+            $processo = new Processo;
+            $processo->id = (string) Str::uuid();
             $processo->usuario_id = $usuarioId;
-            $processo->titulo = $faker->randomElement($documentTypes) . ' - ' . $faker->company;
+            $processo->titulo = $faker->randomElement($documentTypes).' - '.$faker->company;
             $processo->descricao = $faker->sentence(10);
             $processo->status = $faker->randomElement($statusOptions);
             $processo->categoria = $faker->randomElement($categorias);
-            $processo->url = 'https://example.com/docs/' . $faker->uuid . '.pdf';
-            
+            $processo->url = 'https://example.com/docs/'.$faker->uuid.'.pdf';
+
             // Randomize creation date
             $createdAt = $faker->dateTimeBetween('-6 months', 'now');
             $processo->created_at = $createdAt;
@@ -73,8 +75,8 @@ class ProcessoSeeder extends Seeder
             $assocCount = rand(1, 4);
             $selectedSignatarios = $faker->randomElements($signatarioIds, min($assocCount, count($signatarioIds)));
             foreach ($selectedSignatarios as $signatarioId) {
-                $relation = new SignatarioProcesso();
-                $relation->id = (string) \Illuminate\Support\Str::uuid();
+                $relation = new SignatarioProcesso;
+                $relation->id = (string) Str::uuid();
                 $relation->signatario_id = $signatarioId;
                 $relation->processo_id = $processo->id;
                 $relation->created_at = $faker->dateTimeBetween($createdAt, 'now');
@@ -85,16 +87,16 @@ class ProcessoSeeder extends Seeder
             $historyCount = rand(0, 5);
             for ($h = 0; $h < $historyCount; $h++) {
                 $campo = $faker->randomElement(['titulo', 'descricao', 'status', 'categoria', 'url']);
-                $descricao = match($campo) {
-                    'titulo' => "Título alterado para: " . $faker->randomElement($documentTypes) . ' - ' . $faker->company,
-                    'descricao' => "Descrição atualizada para: " . $faker->sentence(8),
-                    'status' => "Status alterado para: " . $faker->randomElement($statusOptions),
-                    'categoria' => "Categoria alterada para: " . $faker->randomElement($categorias),
-                    'url' => "URL do documento atualizada para: https://example.com/docs/" . $faker->uuid . ".pdf",
+                $descricao = match ($campo) {
+                    'titulo' => 'Título alterado para: '.$faker->randomElement($documentTypes).' - '.$faker->company,
+                    'descricao' => 'Descrição atualizada para: '.$faker->sentence(8),
+                    'status' => 'Status alterado para: '.$faker->randomElement($statusOptions),
+                    'categoria' => 'Categoria alterada para: '.$faker->randomElement($categorias),
+                    'url' => 'URL do documento atualizada para: https://example.com/docs/'.$faker->uuid.'.pdf',
                 };
 
-                $historico = new ProcessoHistorico();
-                $historico->id = (string) \Illuminate\Support\Str::uuid();
+                $historico = new ProcessoHistorico;
+                $historico->id = (string) Str::uuid();
                 $historico->processo_id = $processo->id;
                 $historico->campo = $campo;
                 $historico->descricao = $descricao;

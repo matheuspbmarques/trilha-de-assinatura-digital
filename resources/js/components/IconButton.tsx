@@ -1,4 +1,5 @@
-import { ButtonProps, Button } from '@mui/material';
+import type { ButtonProps} from '@mui/material';
+import { Button } from '@mui/material';
 
 export function IconButton({ className, ...props }: ButtonProps) {
     return (

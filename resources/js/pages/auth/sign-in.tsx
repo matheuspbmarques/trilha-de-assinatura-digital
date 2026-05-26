@@ -1,4 +1,6 @@
-import { AuthLayout } from './components/AuthLayout';
+import { useForm } from '@inertiajs/react';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import {
     Button,
     FormControl,
@@ -9,14 +11,13 @@ import {
     OutlinedInput,
     TextField,
 } from '@mui/material';
+import type { SubmitEventHandler} from 'react';
+import { useState } from 'react';
 import SignInIllustration from '../../components/illustrations/SignInIllustration';
-import { SubmitEventHandler, useState } from 'react';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import { useForm } from '@inertiajs/react';
+import { AuthLayout } from './components/AuthLayout';
 
 export default function SignIn() {
-    const [showPassword, setShowPassword] = useState<Boolean>(false);
+    const [showPassword, setShowPassword] = useState<boolean>(false);
 
     const { post, errors, setData, processing } = useForm({
         acesso: '',
@@ -63,7 +64,7 @@ export default function SignIn() {
                                             setShowPassword(!showPassword)
                                         }
                                         color={
-                                            !!errors.senha ? 'error' : undefined
+                                            errors.senha ? 'error' : undefined
                                         }
                                     >
                                         {showPassword ? (

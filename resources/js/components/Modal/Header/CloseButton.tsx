@@ -1,6 +1,6 @@
-import { IconButton } from '@/components/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-import { ButtonProps } from '@mui/material';
+import type { ButtonProps } from '@mui/material';
+import { IconButton } from '@/components/IconButton';
 
 export function CloseButton({ ...props }: ButtonProps) {
     return (

@@ -10,23 +10,28 @@ use Jose\Component\Signature\JWSBuilder;
 use Jose\Component\Signature\JWSVerifier;
 use Jose\Component\Signature\Serializer\CompactSerializer;
 
-class JwtService {
+class JwtService
+{
     private AlgorithmManager $algorithmManager;
+
     private JWK $jwk;
+
     private CompactSerializer $serializer;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->jwk = JWKFactory::createFromSecret(env('APP_KEY', [
             'alg' => 'HS256',
             'use' => 'sig',
         ]));
         $this->algorithmManager = new AlgorithmManager([
-            new HS256()
+            new HS256,
         ]);
-        $this->serializer = new CompactSerializer();
+        $this->serializer = new CompactSerializer;
     }
 
-    public function sign(string $usuario_id): string {
+    public function sign(string $usuario_id): string
+    {
         $payload = json_encode([
             'usuario_id' => $usuario_id,
         ]);
@@ -44,7 +49,8 @@ class JwtService {
         return $token;
     }
 
-    public function verify(string $token): string | null {
+    public function verify(string $token): ?string
+    {
         $jwsVerifier = new JWSVerifier($this->algorithmManager);
 
         $jws = $this->serializer->unserialize($token);

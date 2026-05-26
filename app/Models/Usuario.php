@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property string $id
@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
  * @property string $senha
  * @property string $created_at
  * @property string $updated_at
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario query()
@@ -20,6 +21,7 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario whereSenha($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Usuario whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  * @mixin IdeHelperUsuario
  */
@@ -28,7 +30,8 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 class Usuario extends Model
 {
     public $timestamps = false;
+
     public $incrementing = false;
+
     public $keyType = 'string';
 }
-

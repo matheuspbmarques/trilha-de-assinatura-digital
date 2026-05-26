@@ -1,3 +1,5 @@
+import { router } from '@inertiajs/react';
+import MenuIcon from '@mui/icons-material/Menu';
 import {
     AppBar,
     Drawer,
@@ -10,11 +12,9 @@ import {
     Toolbar,
     Typography,
 } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
 import { useState } from 'react';
-import { MenuItem } from './DashboardLayout';
+import type { MenuItem } from './DashboardLayout';
 import { SignOutMenuButton } from './SignOutMenuButton';
-import { router } from '@inertiajs/react';
 
 export default function MobileMenu({
     menuItems,

@@ -1,8 +1,7 @@
-import MobileMenu from './MobileMenu';
-import { HTMLAttributes, ReactElement } from 'react';
+import { router } from '@inertiajs/react';
+import FilePresentIcon from '@mui/icons-material/FilePresent';
 import HomeFilledIcon from '@mui/icons-material/HomeFilled';
 import PeopleIcon from '@mui/icons-material/People';
-import FilePresentIcon from '@mui/icons-material/FilePresent';
 import {
     List,
     ListItem,
@@ -10,8 +9,9 @@ import {
     ListItemIcon,
     ListItemText,
 } from '@mui/material';
+import type { HTMLAttributes, ReactElement } from 'react';
+import MobileMenu from './MobileMenu';
 import { SignOutMenuButton } from './SignOutMenuButton';
-import { router } from '@inertiajs/react';
 
 export type MenuItem = {
     icon: ReactElement;
@@ -54,7 +54,7 @@ export default function DashboardLayout({
     });
 
     return (
-        <div {...props} className="flex h-dvh flex-col lg:flex-row">
+        <div {...props} className={`flex h-dvh flex-col lg:flex-row ${className || ''}`}>
             <MobileMenu menuItems={menuItems} />
             <aside
                 color="#1769aa"

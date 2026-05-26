@@ -6,14 +6,17 @@ use App\Http\Services\AuthService;
 use Illuminate\Http\Request;
 use Validator;
 
-class AuthController {
+class AuthController
+{
     private AuthService $authService;
 
-    public function __construct() {
-        $this->authService = new AuthService();
+    public function __construct()
+    {
+        $this->authService = new AuthService;
     }
 
-    public function signIn(Request $request) {
+    public function signIn(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'acesso' => ['required'],
             'senha' => ['required'],
@@ -29,7 +32,8 @@ class AuthController {
         return $this->authService->signIn($request);
     }
 
-    public function signOut(Request $request) {
+    public function signOut(Request $request)
+    {
         $request->session()->remove('USUARIO_TOKEN');
         $request->session()->remove('USUARIO_ID');
 

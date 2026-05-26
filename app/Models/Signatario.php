@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property bool $ativo
  * @property string $created_at
  * @property string $updated_at
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Signatario newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Signatario newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Signatario query()
@@ -25,13 +26,16 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Signatario whereNome($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Signatario whereSetor($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Signatario whereUpdatedAt($value)
+ *
  * @mixin \Eloquent
  * @mixin IdeHelperSignatario
  */
 #[Guarded(['nome', 'email', 'cargo', 'setor', 'ativo'])]
-class Signatario extends Model {
+class Signatario extends Model
+{
     public $timestamps = false;
+
     public $incrementing = false;
+
     public $keyType = 'string';
 }
-

@@ -11,8 +11,9 @@ class AuthMiddleware
 {
     private JwtService $jwtService;
 
-    public function __construct() {
-        $this->jwtService = new JwtService();
+    public function __construct()
+    {
+        $this->jwtService = new JwtService;
     }
 
     /**
@@ -30,7 +31,7 @@ class AuthMiddleware
 
             $usuario_id = $this->jwtService->verify($accessToken);
 
-            if (!$usuario_id) {
+            if (! $usuario_id) {
                 $request->session()->remove('USUARIO_TOKEN');
 
                 return redirect()->route('auth.sign-in');
@@ -38,8 +39,8 @@ class AuthMiddleware
 
             $hasUsuarioId = $request->session()->has('USUARIO_ID');
 
-            if (!$hasUsuarioId) {
-                $request->session()->put('USUARIO_ID');
+            if (! $hasUsuarioId) {
+                $request->session()->put('USUARIO_ID', $usuario_id);
             }
 
             if ($route == '/auth/sign-in') {

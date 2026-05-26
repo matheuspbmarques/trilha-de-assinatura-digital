@@ -1,3 +1,4 @@
+import { router } from '@inertiajs/react';
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import {
     ListItem,
@@ -5,7 +6,6 @@ import {
     ListItemIcon,
     ListItemText,
 } from '@mui/material';
-import { router } from '@inertiajs/react';
 import { localApiBaseUrl } from '@/api/local.api';
 
 export function SignOutMenuButton() {

@@ -1,7 +1,7 @@
-import { TSignatario } from '@/types/signatarios.types';
+import EditIcon from '@mui/icons-material/Edit';
 import { Paper, Typography } from '@mui/material';
 import { IconButton } from '@/components/IconButton';
-import EditIcon from '@mui/icons-material/Edit';
+import type { TSignatario } from '@/types/signatarios.types';
 
 type TSignatarioCard = TSignatario & {
     onEdit(): void;

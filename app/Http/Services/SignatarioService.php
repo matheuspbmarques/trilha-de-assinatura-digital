@@ -5,14 +5,17 @@ namespace App\Http\Services;
 use App\Http\Repositories\SignatarioRepository;
 use Illuminate\Http\Request;
 
-class SignatarioService {
+class SignatarioService
+{
     private SignatarioRepository $signatarioRepository;
 
-    public function __construct() {
-        $this->signatarioRepository = new SignatarioRepository();
+    public function __construct()
+    {
+        $this->signatarioRepository = new SignatarioRepository;
     }
 
-    public function create(Request $request) {
+    public function create(Request $request)
+    {
         $nome = $request->input('nome');
         $email = $request->input('email');
         $cargo = $request->input('cargo');
@@ -23,11 +26,13 @@ class SignatarioService {
         return back();
     }
 
-    public function getAll() {
+    public function getAll()
+    {
         return $this->signatarioRepository->findAll();
     }
 
-    public function update(string $id, Request $request) {
+    public function update(string $id, Request $request)
+    {
         $nome = $request->input('nome');
         $email = $request->input('email');
         $cargo = $request->input('cargo');

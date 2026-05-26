@@ -6,32 +6,36 @@ use App\Http\Repositories\UsuarioRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
-class AuthService {
+class AuthService
+{
     private UsuarioRepository $usuarioRepository;
+
     private JwtService $jwt;
 
-    public function __construct() {
-        $this->usuarioRepository = new UsuarioRepository();
-        $this->jwt = new JwtService();
+    public function __construct()
+    {
+        $this->usuarioRepository = new UsuarioRepository;
+        $this->jwt = new JwtService;
     }
 
-    public function signIn(Request $request) {
+    public function signIn(Request $request)
+    {
         $acesso = $request->input('acesso');
         $senha = $request->input('senha');
 
         $usuario = $this->usuarioRepository->findByAcesso($acesso);
 
-        if (!$usuario) {
+        if (! $usuario) {
             return back()->withErrors([
-                'acesso' => 'Acesso não encontrado'
+                'acesso' => 'Acesso não encontrado',
             ]);
         }
 
         $isSenhaRight = Hash::check($senha, $usuario->senha);
 
-        if (!$isSenhaRight) {
+        if (! $isSenhaRight) {
             return back()->withErrors([
-                'senha' => 'Senha inválida'
+                'senha' => 'Senha inválida',
             ]);
         }
 

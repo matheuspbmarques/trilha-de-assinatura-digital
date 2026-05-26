@@ -1,8 +1,8 @@
-import { Modal } from '@/components/Modal';
-import { Button, TextField, Switch, FormControlLabel } from '@mui/material';
 import { useForm } from '@inertiajs/react';
-import { SubmitEventHandler, useEffect } from 'react';
-import { TSignatario } from '@/types/signatarios.types';
+import { Button, TextField, Switch, FormControlLabel } from '@mui/material';
+import type { SubmitEventHandler} from 'react';
+import { Modal } from '@/components/Modal';
+import type { TSignatario } from '@/types/signatarios.types';
 
 type TAddSignatarioModal = {
     open: boolean;

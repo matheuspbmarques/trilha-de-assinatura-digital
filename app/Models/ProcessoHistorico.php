@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $campo
  * @property string $descricao
  * @property string $created_at
+ *
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProcessoHistorico newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProcessoHistorico newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProcessoHistorico query()
@@ -20,14 +21,17 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProcessoHistorico whereDescricao($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProcessoHistorico whereId($value)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|ProcessoHistorico whereProcessoId($value)
+ *
  * @mixin \Eloquent
  * @mixin IdeHelperProcessoHistorico
  */
 #[Table('processos_historico')]
 #[Guarded(['processo_id', 'campo', 'descricao', 'created_at'])]
-class ProcessoHistorico extends Model {
+class ProcessoHistorico extends Model
+{
     public $timestamps = false;
+
     public $incrementing = false;
+
     public $keyType = 'string';
 }
-

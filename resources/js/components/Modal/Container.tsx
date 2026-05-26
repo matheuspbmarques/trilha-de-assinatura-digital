@@ -1,4 +1,5 @@
-import { Modal, ModalProps } from '@mui/material';
+import type { ModalProps } from '@mui/material';
+import { Modal } from '@mui/material';
 
 type TContainer = {
     open: boolean;
