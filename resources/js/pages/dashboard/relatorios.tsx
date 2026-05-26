@@ -7,6 +7,9 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import PeopleIcon from '@mui/icons-material/People';
 import SearchIcon from '@mui/icons-material/Search';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import StorageIcon from '@mui/icons-material/Storage';
+import CloudQueueIcon from '@mui/icons-material/CloudQueue';
+import TerminalIcon from '@mui/icons-material/Terminal';
 import {
     Paper,
     Typography,
@@ -24,6 +27,11 @@ import {
     TableHead,
     TableRow,
     Chip,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Alert,
 } from '@mui/material';
 import React, { useState } from 'react';
 import DashboardLayout from './components/DashboardLayout';
@@ -76,6 +84,12 @@ type TRelatoriosProps = {
     periodoReport: TPeriodoReportItem[];
     reprovacoesReport: TReprovacaoReportItem[];
     categoriaReport?: TCategoriaReportItem[];
+    datalakeSimulation?: {
+        success: boolean;
+        partitions: string[];
+        count: number;
+    } | null;
+    successMsg?: string | null;
 };
 
 export default function Relatorios({
@@ -85,10 +99,35 @@ export default function Relatorios({
     periodoReport = [],
     reprovacoesReport = [],
     categoriaReport = [],
+    datalakeSimulation = null,
+    successMsg = null,
 }: TRelatoriosProps) {
     const [dataInicioFilter, setDataInicioFilter] = useState(filters.data_inicio || '');
     const [dataFimFilter, setDataFimFilter] = useState(filters.data_fim || '');
     const [agrupamentoFilter, setAgrupamentoFilter] = useState(filters.agrupamento || 'dia');
+
+    const [loadingConsolidation, setLoadingConsolidation] = useState(false);
+    const [loadingSimulation, setLoadingSimulation] = useState(false);
+    const [isDatalakeModalOpen, setIsDatalakeModalOpen] = useState(datalakeSimulation !== null);
+
+    const handleConsolidate = () => {
+        setLoadingConsolidation(true);
+        router.post('/dashboard/relatorios/consolidar', {}, {
+            preserveState: true,
+            onFinish: () => setLoadingConsolidation(false)
+        });
+    };
+
+    const handleSimulateDatalake = () => {
+        setLoadingSimulation(true);
+        router.post('/dashboard/relatorios/simular-datalake', {}, {
+            preserveState: true,
+            onSuccess: () => {
+                setIsDatalakeModalOpen(true);
+            },
+            onFinish: () => setLoadingSimulation(false)
+        });
+    };
 
     const handleApplyFilters = () => {
         router.get(
@@ -342,6 +381,109 @@ return '';
                 <header className="flex justify-between items-center">
                     <Title>Relatórios Gerenciais</Title>
                 </header>
+
+                {successMsg && (
+                    <Alert severity="success" className="rounded-xl shadow-sm border border-green-100 font-medium">
+                        {successMsg}
+                    </Alert>
+                )}
+
+                {/* Datalake & Base Analítica Panel */}
+                <Paper className="p-6 border border-slate-100 rounded-2xl shadow-sm bg-white">
+                    <div className="flex items-center gap-2.5 mb-4">
+                        <div className="p-2 bg-blue-50 text-blue-600 rounded-xl">
+                            <StorageIcon />
+                        </div>
+                        <div>
+                            <Typography variant="subtitle1" className="font-extrabold text-slate-800 leading-tight">
+                                Datalake & Base Analítica
+                            </Typography>
+                            <Typography variant="caption" className="text-slate-400">
+                                Consolidação e exportação de dados analíticos para ferramentas de BI e pipelines externos.
+                            </Typography>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                        {/* Card 1: Banco de Dados Analítico */}
+                        <Box className="p-5 border border-slate-100 rounded-2xl bg-slate-50/50 flex flex-col justify-between">
+                            <div>
+                                <Typography variant="subtitle2" className="font-bold text-slate-700 flex items-center gap-1.5 mb-2">
+                                    <StorageIcon sx={{ fontSize: 18 }} className="text-blue-500" /> Tabela Analítica (DB)
+                                </Typography>
+                                <Typography variant="caption" className="text-slate-400 block mb-4">
+                                    Gera e atualiza a tabela <code>processos_analiticos</code> de forma denormalizada e otimizada para consultas BI.
+                                </Typography>
+                            </div>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleConsolidate}
+                                disabled={loadingConsolidation}
+                                className="w-full text-xs!"
+                                sx={{ textTransform: 'none', fontWeight: 600 }}
+                            >
+                                {loadingConsolidation ? 'Consolidando...' : 'Consolidar no Banco'}
+                            </Button>
+                        </Box>
+
+                        {/* Card 2: Exportação de Arquivos */}
+                        <Box className="p-5 border border-slate-100 rounded-2xl bg-slate-50/50 flex flex-col justify-between">
+                            <div>
+                                <Typography variant="subtitle2" className="font-bold text-slate-700 flex items-center gap-1.5 mb-2">
+                                    <DownloadIcon sx={{ fontSize: 18 }} className="text-emerald-500" /> Exportação de Arquivos
+                                </Typography>
+                                <Typography variant="caption" className="text-slate-400 block mb-4">
+                                    Baixe a base analítica consolidada em formato CSV ou JSON contendo métricas e tempos de resposta.
+                                </Typography>
+                            </div>
+                            <div className="flex gap-2 w-full">
+                                <Button
+                                    variant="outlined"
+                                    color="primary"
+                                    href="/dashboard/relatorios/download-csv"
+                                    target="_blank"
+                                    className="flex-1 text-xs!"
+                                    sx={{ textTransform: 'none', fontWeight: 600 }}
+                                >
+                                    Baixar CSV
+                                </Button>
+                                <Button
+                                    variant="outlined"
+                                    color="primary"
+                                    href="/dashboard/relatorios/download-json"
+                                    target="_blank"
+                                    className="flex-1 text-xs!"
+                                    sx={{ textTransform: 'none', fontWeight: 600 }}
+                                >
+                                    Baixar JSON
+                                </Button>
+                            </div>
+                        </Box>
+
+                        {/* Card 3: Estrutura Datalake Simulação */}
+                        <Box className="p-5 border border-slate-100 rounded-2xl bg-slate-50/50 flex flex-col justify-between">
+                            <div>
+                                <Typography variant="subtitle2" className="font-bold text-slate-700 flex items-center gap-1.5 mb-2">
+                                    <CloudQueueIcon sx={{ fontSize: 18 }} className="text-purple-500" /> Simulação de Datalake
+                                </Typography>
+                                <Typography variant="caption" className="text-slate-400 block mb-4">
+                                    Simula um repositório particionado em diretórios (Hive partition) na pasta do servidor.
+                                </Typography>
+                            </div>
+                            <Button
+                                variant="outlined"
+                                color="secondary"
+                                onClick={handleSimulateDatalake}
+                                disabled={loadingSimulation}
+                                className="w-full text-xs!"
+                                sx={{ textTransform: 'none', fontWeight: 600 }}
+                            >
+                                {loadingSimulation ? 'Simulando...' : 'Simular Particionamento'}
+                            </Button>
+                        </Box>
+                    </div>
+                </Paper>
 
                 {/* Filtros Globais */}
                 <Paper className="p-6 border border-slate-100 rounded-2xl shadow-sm bg-white">
@@ -674,6 +816,63 @@ return '';
                         </Table>
                     </TableContainer>
                 </Paper>
+
+                {/* Modal para Visualização da Simulação de Datalake */}
+                <Dialog
+                    open={isDatalakeModalOpen}
+                    onClose={() => setIsDatalakeModalOpen(false)}
+                    maxWidth="md"
+                    fullWidth
+                    sx={{ '& .MuiPaper-root': { borderRadius: '16px' } }}
+                >
+                    <DialogTitle className="border-b border-slate-100 flex items-center gap-2">
+                        <TerminalIcon className="text-slate-700" />
+                        <span className="font-bold text-slate-800 text-lg">Datalake Simulado - Estrutura de Partições</span>
+                    </DialogTitle>
+                    <DialogContent className="pt-6">
+                        <Typography variant="body2" className="text-slate-600 mb-4">
+                            Abaixo está a representação da estrutura de pastas gerada sob o diretório <code>storage/app/datalake/</code>, particionada por data de criação do processo (padrão Hive Partitioning):
+                        </Typography>
+
+                        {datalakeSimulation ? (
+                            <Box className="bg-slate-950 text-emerald-400 p-6 rounded-xl font-mono text-xs overflow-x-auto shadow-inner leading-relaxed">
+                                <div>$ tree storage/app/datalake</div>
+                                <div className="text-slate-400 mt-2">storage/app/datalake/</div>
+                                <div className="text-slate-400">├── processos_analiticos.csv <span className="text-slate-500">(base analítica consolidada)</span></div>
+                                <div className="text-slate-400">├── processos_analiticos.json <span className="text-slate-500">(base analítica consolidada)</span></div>
+                                
+                                {datalakeSimulation.partitions.map((partition, index) => {
+                                    const parts = partition.replace('datalake/', '').split('/');
+                                    const isLast = index === datalakeSimulation.partitions.length - 1;
+                                    const connector = isLast ? '└── ' : '├── ';
+                                    
+                                    return (
+                                        <div key={index} className="pl-4 mt-2">
+                                            <span className="text-amber-500">{connector}{parts[0]}</span>
+                                            <div className="pl-8 text-blue-400">└── {parts[1]}</div>
+                                            <div className="pl-12 text-teal-400">└── {parts[2]}</div>
+                                            <div className="pl-16 text-slate-400">├── processos.json</div>
+                                            <div className="pl-16 text-slate-400">└── processos.csv</div>
+                                        </div>
+                                    );
+                                })}
+                                
+                                <div className="text-emerald-500/80 mt-4 border-t border-slate-800 pt-3">
+                                    ✔ {datalakeSimulation.count} registros exportados e particionados com sucesso em {datalakeSimulation.partitions.length} diretórios.
+                                </div>
+                            </Box>
+                        ) : (
+                            <Typography variant="body2" className="text-slate-400 italic text-center py-6">
+                                Nenhum dado de simulação disponível. Execute a simulação para gerar os arquivos.
+                            </Typography>
+                        )}
+                    </DialogContent>
+                    <DialogActions className="border-t border-slate-100 p-4">
+                        <Button onClick={() => setIsDatalakeModalOpen(false)} variant="contained" color="inherit" sx={{ textTransform: 'none', fontWeight: 600 }}>
+                            Fechar
+                        </Button>
+                    </DialogActions>
+                </Dialog>
             </Box>
         </DashboardLayout>
     );

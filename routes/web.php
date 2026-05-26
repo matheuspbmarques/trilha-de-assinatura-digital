@@ -15,7 +15,14 @@ Route::middleware(AuthMiddleware::class)->group(function () {
 
     Route::prefix('dashboard')->group(function () {
         Route::get('home', [DashboardController::class, 'index'])->name('dashboard.home');
-        Route::get('relatorios', [RelatorioController::class, 'index'])->name('dashboard.relatorios');
+
+        Route::controller(RelatorioController::class)->group(function () {
+            Route::get('relatorios', 'index')->name('dashboard.relatorios');
+            Route::post('relatorios/consolidar', 'consolidar')->name('dashboard.relatorios.consolidar');
+            Route::post('relatorios/simular-datalake', 'simularDatalake')->name('dashboard.relatorios.simular-datalake');
+            Route::get('relatorios/download-csv', 'downloadCsv')->name('dashboard.relatorios.download-csv');
+            Route::get('relatorios/download-json', 'downloadJson')->name('dashboard.relatorios.download-json');
+        });
 
         Route::controller(SignatarioController::class)->group(function () {
             Route::get('signatarios', 'getAll')->name('dashboard.signatarios');
