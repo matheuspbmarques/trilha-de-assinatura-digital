@@ -6,14 +6,13 @@ import {
     ListItemIcon,
     ListItemText,
 } from '@mui/material';
-import { localApiBaseUrl } from '@/api/local.api';
 
 export function SignOutMenuButton() {
     return (
         <ListItem className="p-0!">
             <ListItemButton
                 onClick={() =>
-                    router.get(`${localApiBaseUrl}/api/auth/sign-out`)
+                    router.get('/api/auth/sign-out')
                 }
                 className='lg:text-slate-100!'
             >
