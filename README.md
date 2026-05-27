@@ -1,14 +1,162 @@
-# Trilha de Assinatura Digital - Análise de Dados
+# Trilha de Assinatura Digital - Análise de Dados e Containerização
 
-Este repositório contém a implementação dos recursos de análise de dados sobre os processos digitais. Toda a inteligência analítica foi centralizada na camada de serviço dedicada (`App\Services\AnalyticsService`), mantendo os controllers limpos e focados apenas em direcionar o fluxo da aplicação.
-
-Abaixo, descrevemos quais indicadores foram implementados, suas fórmulas e a lógica matemática por trás de cada cálculo.
+Este projeto consiste em uma plataforma para controle e auditoria analítica de processos de assinatura digital. O ambiente foi planejado para ser flexível e permitir o desenvolvimento tanto diretamente no host quanto em um ambiente isolado via Docker (Laravel Sail), sem que um interfira ou quebre as configurações do outro.
 
 ---
 
-## Indicadores Implementados
+## 1. Passos para Instalação e Configuração
 
-### 1. Tempo Médio de Aprovação dos Processos
+Você pode executar o projeto de duas formas: utilizando o **Docker (via Laravel Sail)** ou executando diretamente no **Ambiente Local (Host)**.
+
+### Opção A: Execução via Docker (Laravel Sail) - Recomendado
+
+O Docker Compose está configurado para expor as portas sem conflitar com eventuais serviços locais do host (por exemplo, PostgreSQL na porta 5432).
+
+1. **Requisitos**: Docker e Docker Compose instalados.
+2. **Copie o arquivo de ambiente**:
+   ```bash
+   cp .env.example .env
+   ```
+   *Nota: Não é necessário alterar os hosts do banco ou do cache no `.env` para rodar no Docker, pois o `compose.yaml` aplica overrides automáticos para o container (veja a seção de escolhas técnicas).*
+3. **Inicie os containers**:
+   ```bash
+   ./vendor/bin/sail up -d
+   ```
+4. **Instale as dependências e compile o frontend**:
+   ```bash
+   ./vendor/bin/sail npm install
+   ./vendor/bin/sail npm run build  # ou ./vendor/bin/sail npm run dev
+   ```
+5. **Gere a chave da aplicação**:
+   ```bash
+   ./vendor/bin/sail artisan key:generate
+   ```
+
+---
+
+### Opção B: Execução no Ambiente Local (Host)
+
+1. **Requisitos**: PHP >= 8.2, Composer, PostgreSQL rodando localmente (porta 5432), Node.js & NPM.
+2. **Configure o arquivo de ambiente**:
+   ```bash
+   cp .env.example .env
+   ```
+   Certifique-se de que os dados de conexão do seu banco PostgreSQL (`DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`) correspondam às suas credenciais locais no host.
+3. **Instale as dependências**:
+   ```bash
+   composer install
+   npm install
+   ```
+4. **Gere a chave da aplicação**:
+   ```bash
+   php artisan key:generate
+   ```
+5. **Inicie o servidor de desenvolvimento e o Vite**:
+   ```bash
+   php artisan serve --port=8000
+   ```
+   E em outro terminal:
+   ```bash
+   npm run dev
+   ```
+
+---
+
+## 2. Como Executar Migrations e Seeders
+
+As migrations estruturam o banco de dados e os seeders alimentam a aplicação com dados iniciais de teste (usuários, signatários, processos e históricos de auditoria).
+
+### Via Docker (Laravel Sail):
+* **Executar Migrations e Seeders (Tudo junto)**:
+  ```bash
+  ./vendor/bin/sail artisan migrate --seed
+  ```
+* **Executar apenas as migrations**:
+  ```bash
+  ./vendor/bin/sail artisan migrate
+  ```
+* **Executar apenas os seeders**:
+  ```bash
+  ./vendor/bin/sail artisan db:seed
+  ```
+
+### Via Ambiente Local (Host):
+* **Executar Migrations e Seeders (Tudo junto)**:
+  ```bash
+  php artisan migrate --seed
+  ```
+* **Executar apenas as migrations**:
+  ```bash
+  php artisan migrate
+  ```
+* **Executar apenas os seeders**:
+  ```bash
+  php artisan db:seed
+  ```
+
+---
+
+## 3. Como Iniciar Filas/Jobs
+
+A aplicação utiliza filas para processar tarefas demoradas em segundo plano (como a consolidação analítica). O driver de fila está configurado como `database` no arquivo `.env`.
+
+### Via Docker (Laravel Sail):
+Inicie o worker de filas rodando o comando:
+```bash
+./vendor/bin/sail artisan queue:work
+```
+
+### Via Ambiente Local (Host):
+Inicie o worker de filas rodando o comando:
+```bash
+php artisan queue:work
+```
+
+---
+
+## 4. Como Acessar o Sistema
+
+Após iniciar a aplicação, os seguintes endereços estarão disponíveis:
+
+### Acesso via Docker (Laravel Sail):
+* **Aplicação Web**: [http://localhost](http://localhost) (porta padrão `80`)
+* **Painel Mailpit (Captura de E-mails local)**: [http://localhost:8025](http://localhost:8025)
+* **Banco de Dados (PostgreSQL no Host)**: `localhost:5433` (redirecionado do container porta `5432`)
+* **Redis**: `localhost:6379`
+
+### Acesso via Ambiente Local (Host):
+* **Aplicação Web**: [http://localhost:8000](http://localhost:8000) (ou a porta configurada no `artisan serve`)
+* **Vite Dev Server**: `http://localhost:5173`
+
+---
+
+## 5. Usuário e Senha de Teste
+
+A aplicação possui autenticação. O banco seeded possui o seguinte usuário pré-configurado:
+
+* **Usuário (Acesso)**: `test`
+* **Senha**: `senha`
+
+---
+
+## 6. Breve Explicação das Escolhas Técnicas
+
+1. **Separação de Ambientes (Docker vs. Host)**: 
+   Para evitar que as configurações do Docker quebrem o ambiente local do desenvolvedor (ou vice-versa), adotamos uma estratégia de **injeção de ambiente no container via Docker Compose**. 
+   * No arquivo `compose.yaml`, as variáveis `DB_HOST=pgsql`, `REDIS_HOST=redis` e `MAIL_HOST=mailpit` são passadas diretamente na seção `environment` da aplicação.
+   * Isso permite que o arquivo `.env` do host mantenha `DB_HOST=127.0.0.1` e funcione sem modificações ou exposição de chaves privadas locais, mantendo o desenvolvimento no host íntegro.
+   * O banco de dados do Docker Compose foi mapeado para a porta **5433** no host, evitando conflito com instalações locais de PostgreSQL do desenvolvedor (que escutam na porta 5432).
+2. **Laravel 11 & PHP 8.2+**: Utilizado pela robustez do ORM (Eloquent), facilidade na criação de comandos Artisan e arquitetura baseada em serviços.
+3. **Inertia.js & React (TypeScript & Material UI)**: O Inertia conecta o backend Laravel com o frontend React diretamente, evitando a complexidade de um repositório separado e mantendo a experiência de SPA (Single Page Application). A interface analítica foi construída usando componentes modernos do Material UI (MUI).
+4. **Arquitetura Analítica Denormalizada**: Criamos uma tabela analítica (`processos_analiticos`) que serve como uma camada OLAP básica de consulta rápida, evitando múltiplos `JOINs` complexos na base de produção (OLTP).
+
+---
+
+## 7. Explicação dos Indicadores Implementados
+
+Toda a inteligência analítica foi centralizada na camada de serviço dedicada (`App\Services\AnalyticsService`), calculando os seguintes indicadores:
+
+### A. Tempo Médio de Aprovação dos Processos
 Mede o tempo médio decorrido desde o momento da criação de um processo até a sua aprovação final (quando todos os signatários requeridos assinaram).
 
 * **Origem dos Dados**:
@@ -21,9 +169,7 @@ Mede o tempo médio decorrido desde o momento da criação de um processo até a
   $$M\text{é}dia = \frac{1}{N} \sum_{i=1}^{N} Tempo_i$$
 * **Formatação**: Convertido de forma amigável para o usuário (ex: `12 seg`, `5 min`, `3 horas` ou `2 dias e 4h`).
 
----
-
-### 2. Produtividade por Signatário (Tempo Médio de Resposta)
+### B. Produtividade por Signatário (Tempo Médio de Resposta)
 Mede o tempo médio que cada signatário leva para responder a um convite de assinatura (aprovando ou reprovando) a partir do momento em que o convite foi liberado para ele.
 
 * **Origem dos Dados**:
@@ -35,9 +181,7 @@ Mede o tempo médio que cada signatário leva para responder a um convite de ass
   A média por signatário é dada pela soma dos tempos de resposta dividida pelo número total de convites respondidos por ele (aprovações + reprovações).
 * **Formatação**: Exibido em formato compacto na tabela de produtividade (ex: `12s`, `4m`, `2h` ou `1 dia e 3h`).
 
----
-
-### 3. Distribuição por Status
+### C. Distribuição por Status
 Mostra a concentração atual de processos em cada etapa do fluxo de trabalho (Pendente, Em aprovação, Aprovado, Reprovado, Cancelado).
 
 * **Origem dos Dados**: Tabela `processos`, filtrada por período de criação.
@@ -46,20 +190,15 @@ Mostra a concentração atual de processos em cada etapa do fluxo de trabalho (P
   $$Percentual_s = \left( \frac{Quantidade_s}{TotalProcessos} \right) \times 100$$
 * **Garantia de Integridade**: O serviço garante que todos os 5 status sejam retornados (mesmo com valor zero) para que a interface permaneça uniforme.
 
----
-
-### 4. Volume por Categoria
-Identifica qual categoria de processo (ex: Contratos, Recursos Humanos, Jurídico, Financeiro) possui maior volume de tráfego, respondendo à pergunta *"Qual categoria de processo possui maior volume?"*.
+### D. Volume por Categoria
+Identifica qual categoria de processo (ex: Contratos, Recursos Humanos, Jurídico, Financeiro) possui maior volume de tráfego.
 
 * **Origem dos Dados**: Tabela `processos`.
 * **Cálculo**:
   Os processos são agrupados pelo campo `categoria` e contados. O resultado é ordenado do maior volume para o menor, calculando a porcentagem de representatividade de cada categoria:
   $$Percentual_c = \left( \frac{Quantidade_c}{TotalProcessos} \right) \times 100$$
-* **Visualização**: Implementado como um widget gráfico de barras de progresso horizontais customizadas na tela de relatórios gerenciais, com suporte a exportação CSV.
 
----
-
-### 5. Processos Criados e Concluídos por Período
+### E. Processos Criados e Concluídos por Período
 Acompanha a série histórica do fluxo de processos ao longo do tempo, divididos de acordo com o agrupamento selecionado (Dia, Semana ou Mês).
 
 * **Origem dos Dados**:
@@ -69,28 +208,25 @@ Acompanha a série histórica do fluxo de processos ao longo do tempo, divididos
   Divide-se o intervalo de busca em fatias temporais (slots). Para cada slot, conta-se:
   * Quantidade de processos com `created_at` correspondente ao slot (Contagem de Criados).
   * Quantidade de processos com status "Aprovado" ou "Reprovado" cujo `updated_at` corresponde ao slot (Contagem de Concluídos).
-* **Visualização**: Exibido no gráfico de barras vertical animado em SVG no painel de relatórios.
 
 ---
 
-## Estrutura para Datalake & Base Analítica
+## 8. Explicação da Estrutura Criada para Relatórios/Datalake
 
-Visando facilitar a análise de dados por equipes de BI, ferramentas de relatórios externas ou engenharia de dados, implementamos uma infraestrutura analítica contendo tabelas denormalizadas no banco de dados e arquivos estruturados particionados (simulando um Data Lake corporativo).
+Visando facilitar a análise de dados por equipes de BI ou pipelines de engenharia de dados, implementamos uma infraestrutura analítica contendo:
 
-### 1. Tabela Analítica no Banco de Dados (`processos_analiticos`)
-A tabela `processos_analiticos` armazena de forma denormalizada a relação entre **Processos** e seus respectivos **Signatários**. Diferente do modelo transacional (OLTP), o modelo analítico (OLAP) reduz a necessidade de múltiplos `JOINs`, otimizando a performance de leitura.
-
-O schema da tabela contém os seguintes campos:
+### A. Tabela Analítica no Banco de Dados (`processos_analiticos`)
+A tabela `processos_analiticos` armazena de forma denormalizada a relação entre **Processos** e seus respectivos **Signatários**. O schema da tabela contém os seguintes campos:
 
 | Campo | Tipo | Descrição |
 | :--- | :--- | :--- |
 | `id` | `UUID` (PK) | Identificador único do registro analítico. |
 | `processo_id` | `UUID` | Identificador do processo. |
-| `usuario_id` | `UUID` | Identificador do usuário proprietário do processo. |
+| `usuario_id` | `UUID` | Identificador do usuário proprietário. |
 | `titulo` | `VARCHAR(256)` | Título do processo. |
 | `categoria` | `VARCHAR(256)` | Categoria do documento (ex: Recursos Humanos, Financeiro). |
 | `status` | `VARCHAR(64)` | Status geral do processo (Pendente, Aprovado, etc). |
-| `signatario_id` | `UUID` (Nullable) | Identificador do signatário vinculado. |
+| `signatario_id` | `UUID` (Nullable) | Identificador do signatário. |
 | `signatario_nome` | `VARCHAR(256)` (Nullable) | Nome do signatário. |
 | `signatario_cargo` | `VARCHAR(256)` (Nullable) | Cargo do signatário. |
 | `data_criacao` | `TIMESTAMP` | Data de criação do processo. |
@@ -99,30 +235,8 @@ O schema da tabela contém os seguintes campos:
 | `tempo_resposta_em_horas` | `DECIMAL(8,2)` (Nullable) | Tempo de resposta do signatário calculado em horas. |
 | `justificativa_reprovacao` | `VARCHAR(1024)` (Nullable) | Justificativa preenchida pelo signatário em caso de reprovação. |
 
----
-
-### 2. Rotinas de Consolidação e Simulação
-Foram disponibilizados três mecanismos para gerar e exportar estes dados analíticos:
-
-1. **Artisan CLI Command**:
-   ```bash
-   php artisan analytics:consolidate
-   ```
-   Esta rotina limpa a tabela `processos_analiticos`, calcula os indicadores e insere os registros atualizados de todos os processos do sistema. Além disso, exporta os consolidados globais em formatos `CSV` e `JSON` no diretório de datalake e cria uma estrutura de arquivos particionados.
-   
-2. **Background Queueable Job**:
-   O job `App\Jobs\ConsolidateAnalyticsJob` pode ser despachado pela fila (Queue) para rodar de forma assíncrona, evitando que operações demoradas impactem a navegação do usuário.
-
-3. **Painel de Controle no Frontend**:
-   Integrado no menu **Relatórios**, o usuário pode:
-   * Trigar a consolidação da base analítica instantaneamente.
-   * Baixar os arquivos analíticos consolidados globais (`CSV` ou `JSON`).
-   * Simular a geração de partições e visualizar graficamente a árvore de diretórios criada no storage.
-
----
-
-### 3. Simulação de Particionamento (Datalake Hive)
-Ao executar a consolidação ou simulação, os arquivos são gravados no diretório do servidor em `storage/app/private/datalake/`. Para otimizar o processamento de grandes volumes e simular repositórios de nuvem (AWS S3, Google Cloud Storage), o sistema gera uma árvore particionada por data de criação do processo:
+### B. Simulação de Particionamento (Datalake Hive)
+Ao executar a consolidação, os arquivos são gravados no diretório em `storage/app/private/datalake/`. Para otimizar consultas de grandes volumes e simular repositórios de nuvem (AWS S3 ou GCS), o sistema gera uma árvore particionada por data de criação:
 
 ```text
 storage/app/private/datalake/
@@ -140,16 +254,16 @@ storage/app/private/datalake/
                └── processos.json
 ```
 
+### C. Integração com BI e Pipelines
+* **BI (Metabase/PowerBI)**: Conexão direta com a tabela `processos_analiticos` utilizando SQL direto simplificado (`SELECT *`).
+* **Pipelines ETL (Airflow/Athena/BigQuery)**: Consumo incremental de partições de disco ou bucket sincronizado (`aws s3 sync`), utilizando **Partition Pruning** para ler apenas as pastas das datas consultadas.
+
 ---
 
-### 4. Integração Futura com BI e Pipelines de Dados
+## 9. Pontos que Ficaram Pendentes
 
-#### A. Conexão Direta com Ferramentas de BI (Metabase, Power BI, Tableau)
-* **DirectQuery / Import via Banco**: Ferramentas de BI podem se conectar diretamente ao banco PostgreSQL da aplicação e consumir a tabela `processos_analiticos`. Por ser denormalizada, a query de carga do dashboard torna-se trivial (`SELECT * FROM processos_analiticos`), reduzindo o consumo de CPU do banco relacional.
-* **Agendamento de Refresh**: Os dashboards podem agendar atualizações periódicas (ex: a cada hora ou uma vez ao dia) logo após a execução da rotina de consolidação.
+Todas as funcionalidades centrais e requisitos da aplicação foram entregues com sucesso (Dashboard analítico interativo, exportação de Datalake CSV/JSON particionado, filas, histórico de auditoria e Dockerização isolada). Como melhorias futuras e próximos passos, destacam-se:
 
-#### B. Pipelines de Engenharia de Dados (ETL/ELT - Airflow, dbt)
-* **Ingestão Incremental**: Pipelines de engenharia de dados (como Apache Airflow ou Prefect) podem executar a CLI `php artisan analytics:consolidate` e capturar apenas as partições correspondentes ao dia de processamento (`partition_year=YYYY/partition_month=MM/partition_day=DD`).
-* **Sincronização para Object Storage**: Os dados particionados salvos em disco podem ser sincronizados incrementalmente com buckets na nuvem (ex: `aws s3 sync storage/app/private/datalake/ s3://meu-datalake-corporativo/`).
-* **Consultas Serverless (AWS Athena / BigQuery)**: Uma vez no Cloud Storage sob o formato `partition_year=...`, ferramentas como AWS Athena, Databricks ou Google BigQuery conseguem mapear os arquivos e realizar consultas SQL diretamente sobre o Datalake. O particionamento em pastas garante a técnica de **Partition Pruning** (o Athena lê apenas as pastas das datas consultadas), reduzindo drasticamente o custo e tempo de execução das queries.
-
+1. **Sincronização Direta com Cloud Object Storage**: Implementar um adapter no Laravel Filesystem (ex: AWS S3 ou Google Cloud Storage) para enviar automaticamente as partições de arquivos geradas do Datalake para a nuvem.
+2. **Autenticação Avançada / SSO**: Implementar integração com provedores de SSO (Single Sign-On) ou autenticação via OAuth/OpenID Connect para múltiplos usuários corporativos.
+3. **Geração de PDF do Relatório Analítico**: Adicionar exportação visual direta dos gráficos e widgets analíticos em formato PDF para compartilhamento gerencial rápido.
