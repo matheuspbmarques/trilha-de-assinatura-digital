@@ -377,7 +377,7 @@ return '';
 
     return (
         <DashboardLayout>
-            <Box className="flex flex-col gap-6">
+            <Box className="flex flex-col gap-6 min-w-0 w-full">
                 <header className="flex justify-between items-center">
                     <Title>Relatórios Gerenciais</Title>
                 </header>
@@ -661,7 +661,7 @@ return '';
                 </div>
 
                 {/* Seção 2: Histórico Temporal (Volume por Período) */}
-                <Paper className="p-6 border border-slate-100 rounded-2xl shadow-sm bg-white flex flex-col justify-between">
+                <Paper className="p-6 border border-slate-100 rounded-2xl shadow-sm bg-white flex flex-col justify-between min-w-0">
                     <div>
                         <div className="flex justify-between items-start mb-1">
                             <Typography variant="subtitle1" className="font-extrabold text-slate-800 flex items-center gap-2">

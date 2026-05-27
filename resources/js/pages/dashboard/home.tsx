@@ -206,7 +206,7 @@ return '';
 
     return (
         <DashboardLayout>
-            <Box className="flex flex-col gap-6">
+            <Box className="flex flex-col gap-6 min-w-0 w-full">
                 <header className="flex justify-between items-center">
                     <Title>Acompanhamento de Processos</Title>
                 </header>

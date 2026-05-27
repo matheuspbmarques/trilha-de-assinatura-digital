@@ -60,7 +60,7 @@ export default function DashboardLayout({
     });
 
     return (
-        <div {...props} className={`flex h-dvh flex-col lg:flex-row ${className || ''}`}>
+        <div {...props} className={`flex h-dvh flex-col lg:flex-row overflow-hidden ${className || ''}`}>
             <MobileMenu menuItems={menuItems} />
             <aside
                 color="#1769aa"
@@ -69,7 +69,7 @@ export default function DashboardLayout({
                 <List className="flex-1! p-0!">{renderMenuItems}</List>
                 <SignOutMenuButton />
             </aside>
-            <main className="flex-1 p-6 flex flex-col gap-6">{children}</main>
+            <main className="flex-1 p-6 flex flex-col gap-6 overflow-y-auto min-h-0 min-w-0">{children}</main>
         </div>
     );
 }
