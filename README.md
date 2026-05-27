@@ -267,3 +267,27 @@ Todas as funcionalidades centrais e requisitos da aplicação foram entregues co
 1. **Sincronização Direta com Cloud Object Storage**: Implementar um adapter no Laravel Filesystem (ex: AWS S3 ou Google Cloud Storage) para enviar automaticamente as partições de arquivos geradas do Datalake para a nuvem.
 2. **Autenticação Avançada / SSO**: Implementar integração com provedores de SSO (Single Sign-On) ou autenticação via OAuth/OpenID Connect para múltiplos usuários corporativos.
 3. **Geração de PDF do Relatório Analítico**: Adicionar exportação visual direta dos gráficos e widgets analíticos em formato PDF para compartilhamento gerencial rápido.
+
+---
+
+## 10. Justificativa de Bibliotecas Auxiliares
+
+Em conformidade com as diretrizes do projeto, detalhamos abaixo as bibliotecas auxiliares utilizadas nas categorias de **Autenticação**, **Layout**, **Exportação de Arquivos**, **Gráficos** e **Manipulação de Planilhas**, com as devidas justificativas técnicas.
+
+### A. Autenticação (Authentication)
+* **`web-token/jwt-framework` (PHP)**: Utilizada para codificação, decodificação, assinatura e validação dos tokens JWT dos convites de assinatura enviados aos signatários. Garante que os tokens de validação sejam criptograficamente seguros e invioláveis, permitindo autenticação stateless e expiração precisa dos links.
+* **`laravel/sanctum` (PHP)**: Usada para a autenticação simples baseada em cookies/tokens de API para as rotas protegidas no painel administrativo e interações seguras de frontend-backend gerenciadas pelo Inertia.js.
+
+### B. Layout & Design System
+* **`@mui/material` & `@mui/icons-material` (React)**: Componentes prontos do Material UI para construir a interface administrativa e os painéis com agilidade, oferecendo tabelas, modais, formulários dinâmicos e feedbacks visuais integrados de alto padrão estético.
+* **`@emotion/react` & `@emotion/styled` (React)**: Mecanismo de estilização dinâmico exigido internamente pelo Material UI para a injeção eficiente de CSS em tempo de execução.
+* **`tailwindcss` & `@tailwindcss/vite` (CSS/Vite)**: Framework utilitário de CSS de alta produtividade. Utilizado em conjunto com o MUI para estilizações rápidas, responsividade complementar, micro-interações, hover effects e gradientes customizados.
+* **`class-variance-authority`, `clsx` & `tailwind-merge`**: Utilitários essenciais no frontend para concatenar classes condicionais e evitar conflitos de estilos gerados dinamicamente no Tailwind CSS.
+
+### C. Exportação de Arquivos & Manipulação de Planilhas
+* **Sem bibliotecas externas adicionais**: Para garantir máxima performance de processamento e evitar dependências complexas (como PhpSpreadsheet), toda a geração e exportação de relatórios analíticos em **CSV** e **JSON** foi desenvolvida de forma nativa:
+  * No **Backend**, a classe `AnalyticsExportService.php` utiliza os fluxos nativos de E/S do PHP (`fopen` com `php://temp` e `fputcsv`) estruturando os arquivos do Datalake com delimitadores de ponto e vírgula e BOM (Byte Order Mark) UTF-8 para compatibilidade direta com o Microsoft Excel.
+  * No **Frontend**, a exportação direta de tabelas do relatório para planilhas em formato de texto separado por ponto e vírgula é feita utilizando a API nativa de `Blob` do próprio navegador no arquivo `relatorios.tsx`.
+
+### D. Gráficos (Charts)
+* **Sem bibliotecas externas adicionais**: Em vez de carregar pacotes pesados como Chart.js ou Recharts, o gráfico de evolução histórica de processos por período foi desenvolvido utilizando elementos **SVG puros dinâmicos** no React. Os cálculos de escala das barras, eixos e tooltip em tempo de execução são resolvidos puramente com TypeScript e estilizados com gradientes e transições nativas do Tailwind CSS no componente `Relatorios.tsx`.
